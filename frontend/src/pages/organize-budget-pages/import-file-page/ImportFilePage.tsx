@@ -3,14 +3,14 @@ import { useTranslation } from "react-i18next"
 import { SUPPORTED_BANKS } from "../../../constants/supported-banks.ts"
 import { colors } from "../../../constants/colors.ts"
 import { mapPKOBPExcelToJson } from "../../../utils/file-parsers/map-pkobp-excel-to-json.ts"
-import { useCategories } from "../../../global-store/reviewable.ts"
+import { useReviewable } from "../../../global-store/reviewable.ts"
 import { mapPKOBPCSVToJson } from "../../../utils/file-parsers/map-pkobp-csv-to-json.ts"
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
 
 const ImportFilePage = () => {
   const { t } = useTranslation()
-  const { setReviewable, reviewable } = useCategories()
+  const { setReviewable, reviewable } = useReviewable()
   const navigate = useNavigate()
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
