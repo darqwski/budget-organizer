@@ -1,0 +1,6 @@
+
+### Saving terminal conifguration
+gnome-terminal --save-config=~/.terminal-config
+
+### Loading terminal conifguration
+gnome-terminal --load-config=/.terminal-config
