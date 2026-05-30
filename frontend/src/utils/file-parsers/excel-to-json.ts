@@ -3,7 +3,7 @@ import * as XLSX from "xlsx"
 export const excelToJson = (
   file: File,
   sheetIndex: number,
-  onLoadCallback: (json: unknown[]) => void
+  onLoadCallback: (json: Record<string, string>[]) => void
 ) => {
   const reader = new FileReader()
   reader.onload = function (e) {
@@ -16,7 +16,7 @@ export const excelToJson = (
 
     const sheet = workbook.Sheets[workbook.SheetNames[sheetIndex]]
 
-    const jsonData = XLSX.utils.sheet_to_json(sheet)
+    const jsonData: Record<string, string>[] = XLSX.utils.sheet_to_json(sheet)
 
     onLoadCallback(jsonData)
   }

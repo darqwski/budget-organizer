@@ -1,4 +1,4 @@
-export const csvToJSON = (csv: string): unknown[] => {
+export const csvToJSON = (csv: string): Record<string, string>[] => {
   const lines = csv.split("\n")
 
   const result = []
@@ -10,8 +10,9 @@ export const csvToJSON = (csv: string): unknown[] => {
     const currentLine = lines[i].split(",")
 
     for (let j = 0; j < headers.length; j++) {
+      const header = headers[j].replaceAll('"', "")
       // @ts-expect-error I will type it someday
-      obj[headers[j]] = currentLine[j]
+      obj[header || `Name${j}`] = currentLine[j]?.replaceAll('"', "") || ""
     }
 
     result.push(obj)

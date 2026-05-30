@@ -5,10 +5,13 @@ import { colors } from "../../../constants/colors.ts"
 import { mapPKOBPExcelToJson } from "../../../utils/file-parsers/map-pkobp-excel-to-json.ts"
 import { useCategories } from "../../../global-store/reviewable.ts"
 import { mapPKOBPCSVToJson } from "../../../utils/file-parsers/map-pkobp-csv-to-json.ts"
+import { useEffect } from "react"
+import { useNavigate } from "react-router"
 
 const ImportFilePage = () => {
   const { t } = useTranslation()
-  const { setReviewable } = useCategories()
+  const { setReviewable, reviewable } = useCategories()
+  const navigate = useNavigate()
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -29,6 +32,12 @@ const ImportFilePage = () => {
     reader.onerror = function () {}
     reader.readAsText(file, "UTF-8")
   }
+
+  useEffect(() => {
+    if (reviewable && reviewable.length) {
+      navigate("/budget/organize")
+    }
+  }, [reviewable, navigate])
 
   return (
     <div className="w-full h-full flex items-center justify-center">
