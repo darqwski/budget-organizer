@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.2.5",
     "antd": "^6.4.3",
     "i18next": "^26.3.0",
     "i18next-browser-languagedetector": "^8.2.1",

@@ -3,5 +3,8 @@
   "Categories": "Categories",
   "Landing Page": "Landing Page",
   "Manage Categories": "Manage Categories",
-  "Organize Budget": "Organize Budget"
+  "Organize Budget": "Organize Budget",
+  "Provide a file with the transfer history": "Provide a file with the transfer history",
+  "Currently supported:": "Currently supported:",
+  "We are not sending this file anywhere - all data is processed locally": "We are not sending this file anywhere - all data is processed locally"
 }

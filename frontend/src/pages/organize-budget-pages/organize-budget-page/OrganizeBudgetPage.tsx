@@ -3,11 +3,12 @@ import { useEffect } from "react"
 import { TEMP_CATEGORIES } from "../../../constants/temp-categories.ts"
 
 const OrganizeBudgetPage = () => {
-  const { categories, setCategories } = useCategories()
+  const { setCategories } = useCategories()
 
   useEffect(() => {
     setCategories(TEMP_CATEGORIES)
   }, [setCategories])
+
   return <div>OrganizeBudgetPage</div>
 }
 

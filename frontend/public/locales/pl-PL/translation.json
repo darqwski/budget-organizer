@@ -3,5 +3,8 @@
   "Landing Page": "Strona główna",
   "Categories": "Kategorie",
   "Manage Categories": "Kategorie",
-  "Organize Budget": "Uporządkuj budżet"
+  "Organize Budget": "Uporządkuj budżet",
+  "Provide a file with the transfer history": "Podaj plik z historią przelewów",
+  "Currently supported:": "Aktualnie wspierane:",
+  "We are not sending this file anywhere - all data is processed locally": "Plik nie zostaje nigdzie wysłany - dane są przetworzone lokalnie"
 }
