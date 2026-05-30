@@ -7,8 +7,10 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint frontend/*/*.* && npx eslint backend/*/*.*"
+    "build": "tsc",
+    "start-server": "node dist/server.js",
+    "dev-server": "nodemon --watch 'sr/backendc/**/*.ts' --exec 'ts-node' src/backend/server.ts",
+    "lint": "eslint 'src/backend/**/*.ts'"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
