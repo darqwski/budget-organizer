@@ -4,20 +4,31 @@ import ManageCategoriesPage from "./pages/manage-categories-page/ManageCategorie
 import ImportFilePage from "./pages/organize-budget-pages/import-file-page/ImportFilePage.tsx"
 import OrganizeBudgetPage from "./pages/organize-budget-pages/organize-budget-page/OrganizeBudgetPage.tsx"
 import SummaryBudgetPage from "./pages/organize-budget-pages/summary-budget-page/SummaryBudgetPage.tsx"
-import { Layout } from "antd"
+import { ConfigProvider, Layout } from "antd"
 import AppToolbar from "./components/AppToolbar/AppToolbar.tsx"
+import { colors } from "./constants/colors.ts"
 
 const App = () => {
   return (
-    <Layout className="w-full h-full bg-white">
-      <Layout.Header className="bg-primary-bg text-white">
-        <AppToolbar />
-      </Layout.Header>
-      <Layout.Content>
-        <Outlet />
-      </Layout.Content>
-      <Layout.Footer>Footer</Layout.Footer>
-    </Layout>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: colors.primary,
+          colorPrimaryBg: colors["primary-bg"],
+          yellow: colors.warning,
+        },
+      }}
+    >
+      <Layout className="w-full h-full bg-white">
+        <Layout.Header className="bg-primary text-white">
+          <AppToolbar />
+        </Layout.Header>
+        <Layout.Content>
+          <Outlet />
+        </Layout.Content>
+        <Layout.Footer>Footer</Layout.Footer>
+      </Layout>
+    </ConfigProvider>
   )
 }
 

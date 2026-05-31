@@ -7,11 +7,13 @@ import { useReviewed } from "../../../global-store/reviewed.ts"
 import { useNavigate } from "react-router"
 import type { Category } from "../../../model/categories.ts"
 import Reviewing from "../../../components/Rewieving/Reviewing.tsx"
+import { useTranslation } from "react-i18next"
 
 const OrganizeBudgetPage = () => {
   const { setCategories, categories } = useCategories()
-  const { reviewable, removeReviewable } = useReviewable()
+  const { reviewable, removeReviewable, moveFirstToEnd } = useReviewable()
   const { addReviewed } = useReviewed()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   useEffect(() => {
     setCategories(TEMP_CATEGORIES)
@@ -41,25 +43,39 @@ const OrganizeBudgetPage = () => {
   }
 
   return (
-    <div>
-      <div>
-        <p>Reviewing</p>
-        {reviewable.length > 0 ? (
-          <Reviewing reviewable={currentlyReviewing} />
-        ) : (
-          <div>DONE</div>
-        )}
-      </div>
-      <div>
-        <p>Categories</p>
-        {categories.map((category) => (
-          <Button
-            key={category.id}
-            onClick={() => onCategorySelected(category)}
-          >
-            {category.name}
-          </Button>
-        ))}
+    <div className="w-full flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex flex-col gap-8">
+        <div>
+          {currentlyReviewing && <Reviewing reviewable={currentlyReviewing} />}
+        </div>
+        <div className="flex flex-col gap-4">
+          <div>
+            <Button
+              color="yellow"
+              className="w-full"
+              variant="solid"
+              onClick={() => moveFirstToEnd()}
+            >
+              {t("Take next one")}
+            </Button>
+          </div>
+          <div className="flex flex-row flex-wrap gap-2">
+            {categories.map((category) => (
+              <Button
+                className="flex-grow"
+                key={category.id}
+                onClick={() => onCategorySelected(category)}
+              >
+                {category.name}
+              </Button>
+            ))}
+          </div>
+          <div>
+            <Button color="blue" className="w-full" variant="solid">
+              {t("Add category")}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
