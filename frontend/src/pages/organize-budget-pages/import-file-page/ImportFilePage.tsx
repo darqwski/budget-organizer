@@ -7,10 +7,12 @@ import { useReviewable } from "../../../global-store/reviewable.ts"
 import { mapPKOBPCSVToJson } from "../../../utils/file-parsers/map-pkobp-csv-to-json.ts"
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
+import { useReviewed } from "../../../global-store/reviewed.ts"
 
 const ImportFilePage = () => {
   const { t } = useTranslation()
   const { setReviewable, reviewable } = useReviewable()
+  const { clearReviewed } = useReviewed()
   const navigate = useNavigate()
   const onFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -21,8 +23,7 @@ const ImportFilePage = () => {
       if (!target?.result) {
         return
       }
-      console.log("file.type", file.type)
-
+      clearReviewed()
       if (file.type === "application/vnd.ms-excel") {
         setReviewable(await mapPKOBPExcelToJson(file))
       } else if (file.type === "text/csv") {

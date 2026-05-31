@@ -15,7 +15,7 @@ export const mapPKOBPCSVToJson = async (file: File): Promise<Reviewable[]> => {
     } = csvRow
     return {
       id: transaction,
-      date: new Date(date),
+      date: date ? new Date(date) : null,
       currency,
       money: Number(money),
       details: {
