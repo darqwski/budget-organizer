@@ -35,7 +35,9 @@ const SummaryBudgetPage = () => {
     (acc, reviewed) => {
       acc[reviewed.category.id].items.push(reviewed)
       acc[reviewed.category.id].sum += reviewed.reviewable.money
-      acc[reviewed.category.id].currency += reviewed.reviewable.currency
+      if (reviewed.reviewable.currency) {
+        acc[reviewed.category.id].currency = reviewed.reviewable.currency
+      }
 
       return acc
     },
@@ -46,7 +48,11 @@ const SummaryBudgetPage = () => {
     return a.sum - b.sum
   })
 
-  const { income, costs } = summaries.reduce<{ income: number; costs: number }>(
+  const { income, costs, allItems } = summaries.reduce<{
+    income: number
+    costs: number
+    allItems: number
+  }>(
     (acc, summary) => {
       for (const item of summary.items) {
         if (item.reviewable.money > 0) {
@@ -55,38 +61,48 @@ const SummaryBudgetPage = () => {
           acc.costs += item.reviewable.money
         }
       }
+      acc.allItems += summary.items.length
       return acc
     },
     {
       income: 0,
       costs: 0,
+      allItems: 0,
     }
   )
 
   return (
-    <div className="w-full lg:w-1/2">
-      <div>
-        {summaries.map((summary) => (
-          <Card size="small">
-            <p className="text-xl">{summary.category.name}</p>
-            <p>{formatMoney(summary.sum, summary.currency)}</p>
-            <p>Ilość wydatków: {summary.items.length}</p>
-          </Card>
-        ))}
-      </div>
-      <div>
-        {summaries.map((summary) => (
-          <p key={summary.category.name + "short"}>
-            {summary.category.name}:{formatMoney(summary.sum, summary.currency)}
-          </p>
-        ))}
-      </div>
-      <div>
-        <p>{t("Total summaries")}</p>
-        <ValueDesc value={income} desc={t("Income")} />
-        <ValueDesc value={costs} desc={t("Costs")} />
+    <div className="w-full flex flex-col justify-center h-full overflow-auto items-center">
+      <div className="lg:w-1/2 w-full">
+        <div className="flex flex-col items-center">
+          {summaries.map((summary) => (
+            <ValueDesc
+              className="w-full"
+              key={summary.category.name}
+              value={formatMoney(summary.sum, summary.currency)}
+              desc={summary.category.name}
+            />
+          ))}
+        </div>
         <Divider />
-        <ValueDesc value={income + costs} desc={t("Total")} />
+        <div className="flex flex-col items-center">
+          <ValueDesc className="w-full" value={income} desc={t("Income")} />
+          <ValueDesc className="w-full" value={costs} desc={t("Costs")} />
+          <Divider />
+          <ValueDesc
+            className="w-full"
+            value={income + costs}
+            desc={t("Total")}
+          />
+        </div>
+        <Divider />
+        <div className="flex flex-col items-center">
+          <ValueDesc
+            className="w-full"
+            value={allItems}
+            desc={t("All items")}
+          />
+        </div>
       </div>
     </div>
   )

@@ -9,8 +9,8 @@ const ValueDesc = ({
 }) => {
   return (
     <dl className={["value-desc", className].filter(Boolean).join(" ")}>
-      <dd>{desc}</dd>
-      <dt>{value}</dt>
+      <dd className="flex-grow w-1/2 text-right">{desc}</dd>
+      <dt className="flex-grow w-1/2 text-left">{value}</dt>
     </dl>
   )
 }
