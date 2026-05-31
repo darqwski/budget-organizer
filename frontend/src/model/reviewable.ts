@@ -3,7 +3,5 @@ export interface Reviewable {
   date: Date | null
   money: number
   currency: string
-  name: string
-  description: string
   details: Record<string, string>
 }

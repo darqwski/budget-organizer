@@ -15,20 +15,18 @@ export const mapPKOBPExcelToJson = async (
         "Opis transakcji": transaction,
         Kwota,
         "Data operacji": date,
-        __EMPTY,
         Waluta,
+        ...rest
       } = excelRow
-      console.log({ date })
-      if (!date) {
-        console.log(excelRow)
-      }
+
       return {
         date: date ? new Date(date) : null,
         id: transaction,
         money: Number(Kwota),
-        name: __EMPTY,
-        description: "",
-        details: excelRow,
+        details: {
+          ...rest,
+          "Opis transakcji": transaction,
+        },
         currency: Waluta,
       }
     })
