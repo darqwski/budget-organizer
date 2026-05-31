@@ -16,7 +16,9 @@ export const excelToJson = (
 
     const sheet = workbook.Sheets[workbook.SheetNames[sheetIndex]]
 
-    const jsonData: Record<string, string>[] = XLSX.utils.sheet_to_json(sheet)
+    const jsonData: Record<string, string>[] = XLSX.utils.sheet_to_json(sheet, {
+      raw: false,
+    })
 
     onLoadCallback(jsonData)
   }

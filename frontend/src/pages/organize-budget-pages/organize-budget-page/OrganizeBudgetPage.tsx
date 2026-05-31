@@ -6,6 +6,7 @@ import { Button } from "antd"
 import { useReviewed } from "../../../global-store/reviewed.ts"
 import { useNavigate } from "react-router"
 import type { Category } from "../../../model/categories.ts"
+import Reviewing from "../../../components/Rewieving/Reviewing.tsx"
 
 const OrganizeBudgetPage = () => {
   const { setCategories, categories } = useCategories()
@@ -23,18 +24,18 @@ const OrganizeBudgetPage = () => {
     }
   }, [])
 
-  const currentlyReviewed = reviewable[0]
+  const currentlyReviewing = reviewable[0]
 
   const onCategorySelected = (category: Category) => {
-    if (!currentlyReviewed) {
+    if (!currentlyReviewing) {
       return
     }
-    const lastReviable = reviewable.length === 1
+    const lastReviewable = reviewable.length === 1
 
-    addReviewed({ reviewable: { ...currentlyReviewed }, category })
-    removeReviewable(currentlyReviewed)
+    addReviewed({ reviewable: { ...currentlyReviewing }, category })
+    removeReviewable(currentlyReviewing)
 
-    if (lastReviable) {
+    if (lastReviewable) {
       navigate("/budget/summary")
     }
   }
@@ -44,11 +45,7 @@ const OrganizeBudgetPage = () => {
       <div>
         <p>Reviewing</p>
         {reviewable.length > 0 ? (
-          <div>
-            <p>{reviewable[0].name}</p>
-            <p>{reviewable[0].date.toLocaleDateString()}</p>
-            <p>{reviewable[0].money}</p>
-          </div>
+          <Reviewing reviewable={currentlyReviewing} />
         ) : (
           <div>DONE</div>
         )}

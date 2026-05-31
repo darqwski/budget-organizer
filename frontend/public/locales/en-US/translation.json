@@ -6,5 +6,9 @@
   "Organize Budget": "Organize Budget",
   "Provide a file with the transfer history": "Provide a file with the transfer history",
   "Currently supported:": "Currently supported:",
-  "We are not sending this file anywhere - all data is processed locally": "We are not sending this file anywhere - all data is processed locally"
+  "We are not sending this file anywhere - all data is processed locally": "We are not sending this file anywhere - all data is processed locally",
+  "More info": "More info",
+  "Description": "Description",
+  "Name": "Name",
+  "Not processed yet (2-3 days ago)": "Not processed yet (2-3 days ago)"
 }

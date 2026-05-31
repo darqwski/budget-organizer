@@ -1,14 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-html, body, #root {
-    height: 100%;
-    margin: 0;
-    width: 100%;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  width: 100%;
 }
 
 #root {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+dl.value-desc {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+dl.value-desc > dd {
+  font-size: 0.75rem;
+  color: #333;
+}
+dl.value-desc > dt {
+  color: #000;
 }

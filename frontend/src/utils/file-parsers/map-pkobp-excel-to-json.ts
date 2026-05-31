@@ -12,15 +12,18 @@ export const mapPKOBPExcelToJson = async (
     .filter((excelRow) => excelRow.Kwota)
     .map((excelRow) => {
       const {
-        __EMPTY_4,
         "Opis transakcji": transaction,
         Kwota,
+        "Data operacji": date,
         __EMPTY,
         Waluta,
       } = excelRow
-      const [, date] = (__EMPTY_4 || "").split(" : ")
+      console.log({ date })
+      if (!date) {
+        console.log(excelRow)
+      }
       return {
-        date: new Date(date),
+        date: date ? new Date(date) : null,
         id: transaction,
         money: Number(Kwota),
         name: __EMPTY,

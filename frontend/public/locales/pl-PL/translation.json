@@ -6,5 +6,9 @@
   "Organize Budget": "Uporządkuj budżet",
   "Provide a file with the transfer history": "Podaj plik z historią przelewów",
   "Currently supported:": "Aktualnie wspierane:",
-  "We are not sending this file anywhere - all data is processed locally": "Plik nie zostaje nigdzie wysłany - dane są przetworzone lokalnie"
+  "We are not sending this file anywhere - all data is processed locally": "Plik nie zostaje nigdzie wysłany - dane są przetworzone lokalnie",
+  "More info": "Sczegóły",
+  "Description": "Opis",
+  "Name": "Nazwa",
+  "Not processed yet (2-3 days ago)": "Niezaksięgowane (2-3 dni temu)"
 }
