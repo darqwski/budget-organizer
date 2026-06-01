@@ -15,7 +15,7 @@ export default defineConfig([
     },
     rules: {
       quotes: ["error", "double"],
-      semi: ["error", "always"],
+      semi: ["always"],
     },
   },
 ])

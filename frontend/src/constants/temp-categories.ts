@@ -1,4 +1,4 @@
-//TODO Create backend for that
+//TODO Create src for that
 
 import type { Category } from "../model/categories.ts"
 const tempCategories = [

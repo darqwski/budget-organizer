@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "backend/**/*"
+    "src/**/*"
   ],
   "exclude": ["node_modules"]
 }

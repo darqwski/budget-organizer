@@ -9,18 +9,24 @@
   "scripts": {
     "build": "tsc",
     "start-server": "node dist/server.js",
-    "dev-server": "nodemon --watch 'backend/**/*.ts' --exec 'ts-node' backend/server.ts",
-    "lint": "eslint 'backend/**/*.ts'"
+    "dev-server": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
+    "lint": "eslint 'src/**/*.ts'"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
+    "@types/express-session": "^1.19.0",
     "@types/node": "^25.9.1",
+    "@types/pg": "^8.20.0",
+    "cookie-parser": "^1.4.7",
     "eslint": "^10.4.1",
     "eslint-config-xo": "^0.52.0",
+    "express-session": "^1.19.0",
     "nodemon": "^3.1.14",
     "prettier": "3.8.3",
     "ts-node": "^10.9.2",

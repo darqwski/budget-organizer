@@ -1,4 +1,4 @@
-import { Card, Divider } from "antd"
+import { Divider } from "antd"
 import { useReviewed } from "../../../global-store/reviewed.ts"
 import { useCategories } from "../../../global-store/categories.ts"
 import type { Category } from "../../../model/categories.ts"
@@ -62,6 +62,7 @@ const SummaryBudgetPage = () => {
         }
       }
       acc.allItems += summary.items.length
+
       return acc
     },
     {
