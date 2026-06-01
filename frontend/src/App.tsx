@@ -7,6 +7,7 @@ import SummaryBudgetPage from "./pages/organize-budget-pages/summary-budget-page
 import { ConfigProvider, Layout } from "antd"
 import AppToolbar from "./components/AppToolbar/AppToolbar.tsx"
 import { colors } from "./constants/colors.ts"
+import LoginPage from "./pages/login-page/LoginPage.tsx"
 
 const App = () => {
   return (
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "manage",
         Component: ManageCategoriesPage,
+      },
+      {
+        path: "login",
+        Component: LoginPage,
       },
       {
         path: "budget",
