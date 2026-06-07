@@ -1,15 +1,18 @@
-import { pool } from "../connection"
-import { Category } from "../../model/categories"
 import { User } from "../../model/users"
+import { Category } from "../../model/categories"
+import { pool } from "../connection"
 import { CATEGORY_STATUS } from "../../constants/category"
 
-export const getActiveCategoriesFromDB = async (
-  user: User
+export const archiveCategoryInDB = async (
+  user: User,
+  category: Category
 ): Promise<Category[]> => {
   try {
     const result = await pool.query(
-      "SELECT category_id, name FROM categories WHERE user_id = $1 AND status = $2",
-      [user.userId, CATEGORY_STATUS.active]
+      `UPDATE categories
+       SET status = $1
+       WHERE user_id = $2 AND category_id = $3;`,
+      [CATEGORY_STATUS.archived, user.userId, category.name]
     )
 
     return result.rows.map((row) => {

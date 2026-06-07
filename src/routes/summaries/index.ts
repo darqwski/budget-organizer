@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, Router } from "express"
-import { getCategories } from "../../database/categories/get-categories"
+import { getActiveCategoriesFromDB } from "../../database/categories/get-categories"
 import { getUserFromRequest } from "../../utils/cookies"
 import {
   Summary,
@@ -72,12 +72,11 @@ router.post(
     try {
       const user = getUserFromRequest(req)
       const { summaryToAdd } = req.body
-      const categories = await getCategories()
 
       if (!user) {
         return res.status(401).json({ message: "Unauthorized" })
       }
-      console.log({ user })
+      const categories = await getActiveCategoriesFromDB(user)
 
       const summary = mapSummaryToAddToSummary(summaryToAdd, user, categories)
 

@@ -1,15 +1,16 @@
-import { pool } from "../connection"
-import { Category } from "../../model/categories"
 import { User } from "../../model/users"
+import { Category } from "../../model/categories"
+import { pool } from "../connection"
 import { CATEGORY_STATUS } from "../../constants/category"
 
-export const getActiveCategoriesFromDB = async (
-  user: User
+export const insertCategoryIntoFromDB = async (
+  user: User,
+  category: Category
 ): Promise<Category[]> => {
   try {
     const result = await pool.query(
-      "SELECT category_id, name FROM categories WHERE user_id = $1 AND status = $2",
-      [user.userId, CATEGORY_STATUS.active]
+      `INSERT INTO categories (user_id, name, status, created) VALUES ($1, $2, $3, current_timestamp);`,
+      [user.userId, category.name, CATEGORY_STATUS.active]
     )
 
     return result.rows.map((row) => {
