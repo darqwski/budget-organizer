@@ -7,3 +7,7 @@
 1. `cd frontend/ && npm run rebuild-tailwind`
 2. `cd frontend/ && npm run dev`
 3. `npm run dev-server`
+
+
+### TODO
+Implement JWT token validation and refreshing

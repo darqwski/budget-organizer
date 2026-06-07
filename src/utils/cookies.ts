@@ -8,5 +8,7 @@ export const getUserFromJWT = (request: Request): User | null => {
     return null
   }
 
+
+
   return null
 }

@@ -5,7 +5,7 @@ import { errorHandler } from "./middlewares/errorHandler"
 import { config } from "dotenv"
 import cookieParser from "cookie-parser"
 import session from "express-session"
-import routerLogin from "./routes/login"
+import routerLogin from "./routes/auth"
 import cors from "cors"
 
 config()
