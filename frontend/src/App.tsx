@@ -8,6 +8,7 @@ import { ConfigProvider, Layout } from "antd"
 import AppToolbar from "./components/AppToolbar/AppToolbar.tsx"
 import { colors } from "./constants/colors.ts"
 import LoginPage from "./pages/login-page/LoginPage.tsx"
+import BudgetDashboardPage from "./pages/organize-budget-pages/budget-dashboard-page/BudgetDashboardPage.tsx"
 
 const App = () => {
   return (
@@ -52,7 +53,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: () => <Navigate to="/budget/import-file" replace />,
+            Component: BudgetDashboardPage,
           },
           { path: "import-file", Component: ImportFilePage },
           { path: "organize", Component: OrganizeBudgetPage },
