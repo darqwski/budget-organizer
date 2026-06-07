@@ -15,7 +15,9 @@ export const getUserByUsernameAndPasswordFromDB = async (
       return null
     }
 
-    return result.rows[0]
+    const { user_id: userId, ...rest } = result.rows[0]
+
+    return { userId, ...rest }
   } catch (error) {
     throw error
   }

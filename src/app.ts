@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser"
 import session from "express-session"
 import routerLogin from "./routes/auth"
 import cors from "cors"
+import routerSummaries from "./routes/summaries"
 
 config()
 
@@ -26,6 +27,7 @@ app.use(
 app.use("/api/rules", rulesRoute)
 app.use("/api/auth", routerLogin)
 app.use("/api/categories", categoriesRoute)
+app.use("/api/summary", routerSummaries)
 
 app.use(errorHandler)
 

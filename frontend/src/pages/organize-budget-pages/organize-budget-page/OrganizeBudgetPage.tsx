@@ -79,7 +79,7 @@ const OrganizeBudgetPage = () => {
           {categories.map((category) => (
             <Button
               className="flex-grow"
-              key={category.id}
+              key={category.categoryId}
               onClick={() => onCategorySelected(category)}
             >
               {category.name}

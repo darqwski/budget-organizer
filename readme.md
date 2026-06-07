@@ -11,3 +11,5 @@
 
 ### TODO
 Implement JWT token validation and refreshing
+
+Unify types between backend and frontend 

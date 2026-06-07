@@ -25,5 +25,5 @@ const tempCategories = [
 
 export const TEMP_CATEGORIES: Category[] = tempCategories.map((name) => ({
   name,
-  id: name,
+  categoryId: name,
 }))

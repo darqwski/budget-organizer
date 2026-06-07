@@ -11,23 +11,38 @@
 //   created timestamp NOT NULL
 
 import { User } from "./users"
+import { Category } from "./categories"
 
 export interface SummaryEntry {
-  originalCategoryId: string
-  currentCategoryId: string
+  originalCategory: Category
+  currentCategory: Category
   value: number
 }
 
-export interface Summary {
-  summaryId: number
-  user: User
-  title: string
-  description: string
-  entries: SummaryEntry
-  balance: number
+export interface SummaryValues {
   originalLimitsExceeded: number
   originalLimitsMet: number
   currentLimitsExceeded: number
   currentLimitsMet: number
-  created: number
+  balance: number
+}
+
+export interface Summary extends SummaryValues {
+  summaryId: number | null
+  user: User
+  title: string
+  description: string
+  entries: SummaryEntry[]
+  created: number | null
+}
+
+export interface SummaryEntryToAdd {
+  category: Category
+  value: number
+}
+
+export interface SummaryToAdd {
+  title: string
+  description: string
+  entries: SummaryEntryToAdd[]
 }
