@@ -9,6 +9,7 @@ import type { Category } from "../../../model/categories.ts"
 import Reviewing from "../../../components/Rewieving/Reviewing.tsx"
 import { useTranslation } from "react-i18next"
 import DebugUtils from "../../../components/DebugUtils.tsx"
+import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 
 const OrganizeBudgetPage = () => {
   const { setCategories, categories } = useCategories()
@@ -56,44 +57,42 @@ const OrganizeBudgetPage = () => {
   }
 
   return (
-    <div className="w-full flex items-center justify-center p-8">
-      <div className="w-full lg:w-1/2 flex flex-col gap-8">
+    <PageWrapper>
+      <div>
+        {currentlyReviewing && <Reviewing reviewable={currentlyReviewing} />}
+      </div>
+      <div className="flex flex-col gap-4">
+        <DebugUtils>
+          <Button onClick={() => fillWithRandomData()}>Randomize</Button>
+        </DebugUtils>
         <div>
-          {currentlyReviewing && <Reviewing reviewable={currentlyReviewing} />}
+          <Button
+            color="yellow"
+            className="w-full"
+            variant="solid"
+            onClick={() => moveFirstToEnd()}
+          >
+            {t("Take next one")}
+          </Button>
         </div>
-        <div className="flex flex-col gap-4">
-          <DebugUtils>
-            <Button onClick={() => fillWithRandomData()}>Randomize</Button>
-          </DebugUtils>
-          <div>
+        <div className="flex flex-row flex-wrap gap-2">
+          {categories.map((category) => (
             <Button
-              color="yellow"
-              className="w-full"
-              variant="solid"
-              onClick={() => moveFirstToEnd()}
+              className="flex-grow"
+              key={category.id}
+              onClick={() => onCategorySelected(category)}
             >
-              {t("Take next one")}
+              {category.name}
             </Button>
-          </div>
-          <div className="flex flex-row flex-wrap gap-2">
-            {categories.map((category) => (
-              <Button
-                className="flex-grow"
-                key={category.id}
-                onClick={() => onCategorySelected(category)}
-              >
-                {category.name}
-              </Button>
-            ))}
-          </div>
-          <div>
-            <Button color="blue" className="w-full" variant="solid">
-              {t("Add category")}
-            </Button>
-          </div>
+          ))}
+        </div>
+        <div>
+          <Button color="blue" className="w-full" variant="solid">
+            {t("Add category")}
+          </Button>
         </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }
 

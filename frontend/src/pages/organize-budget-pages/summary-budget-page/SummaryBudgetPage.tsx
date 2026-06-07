@@ -6,6 +6,7 @@ import type { Reviewed } from "../../../model/reviewed.ts"
 import { formatMoney } from "../../../utils/format-money.ts"
 import { useTranslation } from "react-i18next"
 import ValueDesc from "../../../components/ValueDesc/ValueDesc.tsx"
+import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 
 type CategorySummary = {
   category: Category
@@ -73,39 +74,33 @@ const SummaryBudgetPage = () => {
   )
 
   return (
-    <div className="w-full flex flex-col justify-center h-full overflow-auto items-center">
-      <div className="lg:w-1/2 w-full">
-        <div className="flex flex-col items-center">
-          {summaries.map((summary) => (
-            <ValueDesc
-              className="w-full"
-              key={summary.category.name}
-              value={formatMoney(summary.sum, summary.currency)}
-              desc={summary.category.name}
-            />
-          ))}
-        </div>
-        <Divider />
-        <div className="flex flex-col items-center">
-          <ValueDesc className="w-full" value={income} desc={t("Income")} />
-          <ValueDesc className="w-full" value={costs} desc={t("Costs")} />
-          <Divider />
+    <PageWrapper>
+      <div className="flex flex-col items-center">
+        {summaries.map((summary) => (
           <ValueDesc
             className="w-full"
-            value={income + costs}
-            desc={t("Total")}
+            key={summary.category.name}
+            value={formatMoney(summary.sum, summary.currency)}
+            desc={summary.category.name}
           />
-        </div>
-        <Divider />
-        <div className="flex flex-col items-center">
-          <ValueDesc
-            className="w-full"
-            value={allItems}
-            desc={t("All items")}
-          />
-        </div>
+        ))}
       </div>
-    </div>
+      <Divider />
+      <div className="flex flex-col items-center">
+        <ValueDesc className="w-full" value={income} desc={t("Income")} />
+        <ValueDesc className="w-full" value={costs} desc={t("Costs")} />
+        <Divider />
+        <ValueDesc
+          className="w-full"
+          value={income + costs}
+          desc={t("Total")}
+        />
+      </div>
+      <Divider />
+      <div className="flex flex-col items-center">
+        <ValueDesc className="w-full" value={allItems} desc={t("All items")} />
+      </div>
+    </PageWrapper>
   )
 }
 
