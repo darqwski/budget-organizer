@@ -12,7 +12,7 @@ export const archiveCategoryInDB = async (
       `UPDATE categories
        SET status = $1
        WHERE user_id = $2 AND category_id = $3;`,
-      [CATEGORY_STATUS.archived, user.userId, category.name]
+      [CATEGORY_STATUS.archived, user.userId, category.categoryId]
     )
 
     return result.rows.map((row) => {

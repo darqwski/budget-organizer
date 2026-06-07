@@ -7,15 +7,20 @@ import type {
   SummaryToAdd,
 } from "../../../model/summaries.ts"
 import { formatDate } from "../../../utils/format-date.ts"
-import { TEMP_CATEGORIES } from "../../../constants/temp-categories.ts"
+import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
 
 const BudgetDashboardPage = () => {
   const { t } = useTranslation()
+  const { categories } = useCategoriesFromServer()
 
   const addDebugSummary = async () => {
-    const randomEntries = [...TEMP_CATEGORIES]
+    if (!categories) {
+      return
+    }
+
+    const randomEntries = [...categories]
       .sort(() => Math.random() - 0.5)
-      .slice(0, Math.floor(Math.random() * TEMP_CATEGORIES.length))
+      .slice(0, Math.floor(Math.random() * categories.length))
 
     const entriesToAdd: SummaryEntryToAdd[] = randomEntries.map(
       (randomEntry) => ({

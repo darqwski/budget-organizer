@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, Outlet } from "react-router"
+import { createBrowserRouter, Outlet } from "react-router"
 import LandingPage from "./pages/landing-page/LandingPage.tsx"
 import ManageCategoriesPage from "./pages/manage-categories-page/ManageCategoriesPage.tsx"
 import ImportFilePage from "./pages/organize-budget-pages/import-file-page/ImportFilePage.tsx"
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: LandingPage },
       {
-        path: "manage",
+        path: "manage-categories",
         Component: ManageCategoriesPage,
       },
       {

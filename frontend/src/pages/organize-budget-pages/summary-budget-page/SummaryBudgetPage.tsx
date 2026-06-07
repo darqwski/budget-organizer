@@ -1,12 +1,12 @@
 import { Divider } from "antd"
 import { useReviewed } from "../../../global-store/reviewed.ts"
-import { useCategories } from "../../../global-store/categories.ts"
 import type { Category } from "../../../model/categories.ts"
 import type { Reviewed } from "../../../model/reviewed.ts"
 import { formatMoney } from "../../../utils/format-money.ts"
 import { useTranslation } from "react-i18next"
 import ValueDesc from "../../../components/ValueDesc/ValueDesc.tsx"
 import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
+import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
 
 type CategorySummary = {
   category: Category
@@ -17,11 +17,11 @@ type CategorySummary = {
 
 const SummaryBudgetPage = () => {
   const { reviewed } = useReviewed()
-  const { categories } = useCategories()
+  const { categories } = useCategoriesFromServer()
   const { t } = useTranslation()
-  const initialMap = categories.reduce<Record<string, CategorySummary>>(
+  const initialMap = (categories || []).reduce<Record<string, CategorySummary>>(
     (acc, category) => {
-      acc[category.id] = {
+      acc[category.categoryId] = {
         category,
         items: [],
         sum: 0,
@@ -34,10 +34,11 @@ const SummaryBudgetPage = () => {
   )
   const summaryByCategoryId = reviewed.reduce<Record<string, CategorySummary>>(
     (acc, reviewed) => {
-      acc[reviewed.category.id].items.push(reviewed)
-      acc[reviewed.category.id].sum += reviewed.reviewable.money
+      acc[reviewed.category.categoryId].items.push(reviewed)
+      acc[reviewed.category.categoryId].sum += reviewed.reviewable.money
       if (reviewed.reviewable.currency) {
-        acc[reviewed.category.id].currency = reviewed.reviewable.currency
+        acc[reviewed.category.categoryId].currency =
+          reviewed.reviewable.currency
       }
 
       return acc

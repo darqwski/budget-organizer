@@ -1,6 +1,4 @@
-import { useCategories } from "../../../global-store/categories.ts"
 import { useEffect } from "react"
-import { TEMP_CATEGORIES } from "../../../constants/temp-categories.ts"
 import { useReviewable } from "../../../global-store/reviewable.ts"
 import { Button } from "antd"
 import { useReviewed } from "../../../global-store/reviewed.ts"
@@ -10,16 +8,14 @@ import Reviewing from "../../../components/Rewieving/Reviewing.tsx"
 import { useTranslation } from "react-i18next"
 import DebugUtils from "../../../components/DebugUtils.tsx"
 import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
+import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
 
 const OrganizeBudgetPage = () => {
-  const { setCategories, categories } = useCategories()
+  const { categories } = useCategoriesFromServer()
   const { reviewable, removeReviewable, moveFirstToEnd } = useReviewable()
   const { addReviewed } = useReviewed()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  useEffect(() => {
-    setCategories(TEMP_CATEGORIES)
-  }, [setCategories])
 
   //TODO avoid useEffect
   useEffect(() => {
@@ -42,6 +38,10 @@ const OrganizeBudgetPage = () => {
     if (lastReviewable) {
       navigate("/budget/summary")
     }
+  }
+
+  if (!categories) {
+    return
   }
 
   const fillWithRandomData = () => {
