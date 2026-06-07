@@ -4,19 +4,35 @@ import AppLogo from "../../components/AppLogo.tsx"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { loginSchema, type LoginSchema } from "../../schemas/login.schema.ts"
+import { http } from "../../api/http.ts"
+import { sha256 } from "../../utils/sha256.ts"
+import { loginUserEndpoint } from "../../api/auth.ts"
+import { useNavigate } from "react-router"
+import ErrorMessage from "../../components/Form/ErrorMessage/ErrorMessage.tsx"
+
 const LoginPage = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
-  const { handleSubmit, control } = useForm<LoginSchema>({
+  const { handleSubmit, control, setError, formState } = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       login: "",
       password: "",
+      form: undefined,
     },
   })
 
-  const onSubmit = (values: LoginSchema) => {
-    console.log({ values })
+  const onSubmit = async ({ login, password }: LoginSchema) => {
+    const errorMessage = await loginUserEndpoint({ login, password })
+
+    if (errorMessage) {
+      setError("form", {
+        message: t("Username or password is incorrect"),
+      })
+    } else {
+      navigate("/budget")
+    }
   }
 
   return (
@@ -35,9 +51,7 @@ const LoginPage = () => {
                 <Form.Item label={t("Login")}>
                   <Input {...controller.field} />
                   {error?.message && (
-                    <p className="font-xs text-error">
-                      {String(error.message)}
-                    </p>
+                    <ErrorMessage message={String(error.message)} />
                   )}
                 </Form.Item>
               )
@@ -53,15 +67,16 @@ const LoginPage = () => {
                 <Form.Item label={t("Password")}>
                   <Input {...field} type="password" />
                   {error?.message && (
-                    <p className="font-xs text-error">
-                      {String(error.message)}
-                    </p>
+                    <ErrorMessage message={String(error.message)} />
                   )}
                 </Form.Item>
               )
             }}
           />
           <Button htmlType="submit">{t("Login")}</Button>
+          {formState.errors.form && (
+            <ErrorMessage message={String(formState.errors.form.message)} />
+          )}
         </form>
         <Divider />
         <div></div>
