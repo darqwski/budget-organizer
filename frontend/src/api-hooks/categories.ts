@@ -12,7 +12,7 @@ type UseCategories = {
 }
 
 const useCategories = create<UseCategories>((set) => ({
-  categories: [],
+  categories: null,
   setLoading: (loading) => set({ loading }),
   loading: false,
   setCategories: (categories: Category[]) => set({ categories }),
