@@ -1,7 +1,7 @@
 // TODO implement variables
 const SERVER = "localhost:3000"
 
-const overwrittenFetch = async (
+const overwrittenFetch = async <DataType = unknown>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
   body?: object
@@ -18,7 +18,7 @@ const overwrittenFetch = async (
 
   const { status } = result
 
-  const data = await result.json()
+  const data = (await result.json()) as DataType
   if (status === 200) {
     return { data, status }
   }
@@ -27,8 +27,12 @@ const overwrittenFetch = async (
 }
 
 export const http = {
-  get: (url: string) => overwrittenFetch("GET", url),
-  post: (url: string, body?: object) => overwrittenFetch("POST", url, body),
-  put: (url: string, body?: object) => overwrittenFetch("PUT", url, body),
-  delete: (url: string, body?: object) => overwrittenFetch("DELETE", url, body),
+  get: <DataType = unknown>(url: string) =>
+    overwrittenFetch<DataType>("GET", url),
+  post: <DataType = unknown>(url: string, body?: object) =>
+    overwrittenFetch<DataType>("POST", url, body),
+  put: <DataType = unknown>(url: string, body?: object) =>
+    overwrittenFetch<DataType>("PUT", url, body),
+  delete: <DataType = unknown>(url: string, body?: object) =>
+    overwrittenFetch<DataType>("DELETE", url, body),
 }

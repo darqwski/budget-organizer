@@ -35,7 +35,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     const token = generateJWT(user)
     res.cookie(COOKIE_SESSION_ID_KEY, token, {
       maxAge: JWT_LIFETIME,
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       sameSite: "none",
     })

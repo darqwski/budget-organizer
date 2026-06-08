@@ -1,8 +1,23 @@
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { useTranslation } from "react-i18next"
+import {
+  COOKIE_SESSION_ID_KEY,
+  getCookieByName,
+  outdateCookie,
+} from "../../utils/cookies.ts"
+import { Button } from "antd"
 
 const AppToolbar = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+
+  const isLoggedIn = getCookieByName(COOKIE_SESSION_ID_KEY)
+
+  const logout = () => {
+    outdateCookie(COOKIE_SESSION_ID_KEY)
+    navigate("/login")
+  }
+
   return (
     <div className="flex flex-row w-full gap-4">
       <div>BudgetOrganizer</div>
@@ -23,7 +38,19 @@ const AppToolbar = () => {
           {t("Categories")}
         </Link>
       </div>
-      <div>Login/Logout/Settings</div>
+      <div>
+        {isLoggedIn ? (
+          <div className="flex gap-2 items-center h-full">
+            <Button variant="text" onClick={logout}>
+              {t("Logout")}
+            </Button>
+          </div>
+        ) : (
+          <Button variant="text" onClick={() => navigate("/login")}>
+            {t("Login")}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

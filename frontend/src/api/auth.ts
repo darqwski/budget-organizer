@@ -7,14 +7,9 @@ export const loginUserEndpoint = async ({
 }: {
   login: string
   password: string
-}): Promise<string | undefined> => {
-  try {
-    const result = await http.post("/auth", {
-      login,
-      password: await sha256(password),
-    })
-    console.log({ result })
-  } catch (exception) {
-    return exception
-  }
+}): Promise<void> => {
+  await http.post("/auth", {
+    login,
+    password: await sha256(password),
+  })
 }
