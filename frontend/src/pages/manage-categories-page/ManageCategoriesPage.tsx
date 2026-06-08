@@ -1,10 +1,10 @@
 import PageWrapper from "../../components/PageWrapper/PageWrapper.tsx"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import {
   mutateAddCategory,
   mutateArchiveCategory,
 } from "../../api/categories.ts"
-import { Button, Card, Form, Input, Table } from "antd"
+import { Button, Card, Form, Input, Modal, Table } from "antd"
 import { useTranslation } from "react-i18next"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,6 +15,7 @@ import {
 import ErrorMessage from "../../components/Form/ErrorMessage/ErrorMessage.tsx"
 import { DeleteFilled, PlusCircleFilled } from "@ant-design/icons"
 import { useCategoriesFromServer } from "../../api-hooks/categories.ts"
+import type { Category } from "../../model/categories.ts"
 
 const ManageCategoriesPage = () => {
   const { categories, refreshCategories } = useCategoriesFromServer()
@@ -25,27 +26,36 @@ const ManageCategoriesPage = () => {
       name: "",
     },
   })
-
+  const [categoryToArchive, setCategoryToArchive] = useState<
+    Category | undefined
+  >()
   const addCategory = async (category: CategorySchema) => {
     await mutateAddCategory(category)
     refreshCategories()
     reset()
   }
 
-  const archiveCategory = useCallback(
-    async (categoryId: string) => {
+  const archiveCategory = useCallback(async () => {
+    if (!categoryToArchive) {
+      return
+    }
+    await mutateArchiveCategory(categoryToArchive)
+    setCategoryToArchive(undefined)
+    refreshCategories()
+  }, [categoryToArchive, refreshCategories])
+
+  const onDeleteClick = useCallback(
+    (categoryId: string) => {
       const categoryToArchive = categories?.find(
         (entry) => entry.categoryId === categoryId
       )
-      console.log({ categoryToArchive })
-
       if (!categoryToArchive) {
         return
       }
-      await mutateArchiveCategory(categoryToArchive)
-      refreshCategories()
+
+      setCategoryToArchive(categoryToArchive)
     },
-    [categories, refreshCategories]
+    [categoryToArchive]
   )
 
   const categoryColumns = useMemo(
@@ -69,14 +79,14 @@ const ManageCategoriesPage = () => {
             size="small"
             type="primary"
             icon={<DeleteFilled />}
-            onClick={() => archiveCategory(categoryId)}
+            onClick={() => onDeleteClick(categoryId)}
           >
             {categoryId}
           </Button>
         ),
       },
     ],
-    [archiveCategory, t]
+    [onDeleteClick, t]
   )
   return (
     <PageWrapper className="gap-8">
@@ -106,6 +116,14 @@ const ManageCategoriesPage = () => {
           />
         </form>
       </Card>
+      <Modal
+        title={t("Archiving category")}
+        open={!!categoryToArchive}
+        onOk={() => archiveCategory()}
+        onCancel={() => setCategoryToArchive(undefined)}
+      >
+        <p>{t("Do you want to remove category?", { categoryToArchive })}</p>
+      </Modal>
     </PageWrapper>
   )
 }
