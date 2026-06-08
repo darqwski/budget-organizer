@@ -16,8 +16,6 @@ export const getUserFromRequest = (request: Request): User | null => {
     return null
   }
 
-  // @ts-ignore
-  console.log(token["user"])
   //@ts-expect-error token is untyped
   return token["user"] as User
 }

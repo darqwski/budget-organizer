@@ -27,7 +27,7 @@ app.use(
 app.use("/api/rules", rulesRoute)
 app.use("/api/auth", routerLogin)
 app.use("/api/categories", categoriesRoute)
-app.use("/api/summary", routerSummaries)
+app.use("/api/summaries", routerSummaries)
 
 app.use(errorHandler)
 

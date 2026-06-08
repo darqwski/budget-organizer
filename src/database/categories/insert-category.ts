@@ -12,8 +12,6 @@ export const insertCategoryIntoDB = async (
       `INSERT INTO categories (user_id, name, status, created) VALUES ($1, $2, $3, current_timestamp);`,
       [user.userId, category.name, CATEGORY_STATUS.active]
     )
-
-    console.log(result)
   } catch (error) {
     throw error
   }

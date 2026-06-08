@@ -55,7 +55,7 @@ const ManageCategoriesPage = () => {
 
       setCategoryToArchive(categoryToArchive)
     },
-    [categoryToArchive]
+    [categories]
   )
 
   const categoryColumns = useMemo(

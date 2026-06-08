@@ -12,7 +12,7 @@ export interface Summary {
   title: string
   user: User
   description: string
-  entries: SummaryEntry
+  entries: SummaryEntry[]
   balance: number
   originalLimitsExceeded: number
   originalLimitsMet: number

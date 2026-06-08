@@ -1,0 +1,53 @@
+
+
+.pie-chart {
+  display: grid;
+}
+
+.pie-chart li {
+  display: grid;
+  place-items: center;
+
+  grid-row: 1;
+  grid-column: 1;
+
+  --radius: 20vmin;
+
+  width: calc(var(--radius) * 2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+
+  --weighing: calc(attr(data-percentage type(number)) / 100);
+  --percentage: calc(attr(data-percentage type(number)) * 1%);
+  --offset: calc(360deg * attr(data-accumulator type(number)) / 100);
+
+  --theta: calc((360deg * var(--weighing)) / 2 + var(--offset) - 90deg);
+  --gap: 4rem;
+
+  --pos-x: calc(cos(var(--theta)) * (var(--radius) + var(--gap)));
+  --pos-y: calc(sin(var(--theta)) * (var(--radius) + var(--gap)));
+
+  --bg-color: attr(data-color type(color));
+
+  background: conic-gradient(
+          from var(--offset),
+          var(--bg-color) 0% var(--percentage),
+          transparent var(--percentage) 100%
+  );
+}
+
+.pie-chart li::after {
+  content: attr(data-percentage) "%";
+}
+
+.pie-chart li::after,
+strong {
+  grid-row: 1;
+  grid-column: 1;
+
+  transform: translateX(var(--pos-x)) translateY(var(--pos-y));
+}
+
+.pie-chart li::after {
+  --pos-y: calc(sin(var(--theta)) * (var(--radius) + var(--gap)) + 1lh);
+}

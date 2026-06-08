@@ -10,7 +10,6 @@ export const formatDate = (date: Date | null): string | null => {
       day: "numeric",
     }).format(date)
   } catch (e) {
-    console.log({ date })
     console.error(e)
     return "Date error"
   }

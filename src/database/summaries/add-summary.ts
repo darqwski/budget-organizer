@@ -22,7 +22,6 @@ export const insertSummaryIntoDB = async (
       ]
     )
 
-    console.log({ result })
     return result.rows
   } catch (error) {
     throw error

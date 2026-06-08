@@ -10,6 +10,7 @@ import {
 import { Category } from "../../model/categories"
 import { User } from "../../model/users"
 import { insertSummaryIntoDB } from "../../database/summaries/add-summary"
+import { getSummariesFromDB } from "../../database/summaries/get-summaries"
 
 const router = Router()
 
@@ -36,9 +37,10 @@ const mapSummaryToAddToSummary = (
   categories: Category[]
 ): Summary => {
   const categoriesById: Record<string, Category> = Object.fromEntries(
-    categories.map((category) => [category, category.categoryId])
+    categories.map((category) => [category.categoryId, category])
   )
-  console.log({ summaryToAdd })
+
+  console.log("categoriesById", categoriesById)
   const entries: SummaryEntry[] = summaryToAdd.entries.map((entry) => {
     const category = categoriesById[entry.category.categoryId]
 
@@ -63,7 +65,7 @@ const mapSummaryToAddToSummary = (
 }
 
 router.post(
-  "/add",
+  "/",
   async (
     req: Request<any, any, { summaryToAdd: SummaryToAdd }>,
     res: Response,
@@ -78,6 +80,7 @@ router.post(
       }
       const categories = await getActiveCategoriesFromDB(user)
 
+      console.log("categories for mmaping summary", categories.length)
       const summary = mapSummaryToAddToSummary(summaryToAdd, user, categories)
 
       await insertSummaryIntoDB(summary)
@@ -88,5 +91,20 @@ router.post(
     }
   }
 )
+
+router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = getUserFromRequest(req)
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" })
+    }
+    const summaries = await getSummariesFromDB(user)
+
+    res.status(200).json(summaries)
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default router
