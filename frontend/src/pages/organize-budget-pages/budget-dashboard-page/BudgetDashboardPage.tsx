@@ -3,14 +3,16 @@ import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 import DebugUtils from "../../../components/DebugUtils.tsx"
 import { http } from "../../../api/http.ts"
 import type {
+  Summary,
   SummaryEntryToAdd,
   SummaryToAdd,
 } from "../../../model/summaries.ts"
 import { formatDate } from "../../../utils/format-date.ts"
 import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
-import { useSummariesFromServer } from "../../../api-hooks/summaries.ts"
 import type { Category } from "../../../model/categories.ts"
-import SummaryTile from "./components/SummaryTile.tsx"
+import { useState } from "react"
+import SummaryList from "./components/SummaryList.tsx"
+import SummaryDetails from "./components/SummaryDetails.tsx"
 
 const addDebugSummary = async (categories: Category[] | null) => {
   if (!categories) {
@@ -54,21 +56,20 @@ const addDebugSummary = async (categories: Category[] | null) => {
 }
 
 const BudgetDashboardPage = () => {
-  const { t } = useTranslation()
   const { categories } = useCategoriesFromServer()
-  const { summaries } = useSummariesFromServer()
+  const [activeSummary, setActiveSummary] = useState<undefined | Summary>()
 
   return (
     <PageWrapper>
-      <a href="../budget/organize">
-        <div>{t("Organize budget")}</div>
-      </a>
+      {activeSummary ? (
+        <SummaryDetails
+          summary={activeSummary}
+          setActiveSummary={setActiveSummary}
+        />
+      ) : (
+        <SummaryList setActiveSummary={setActiveSummary} />
+      )}
 
-      <div className="flex flex-wrap w-full">
-        {summaries?.map((summary) => (
-          <SummaryTile summary={summary} />
-        ))}
-      </div>
       <DebugUtils>
         <button onClick={() => addDebugSummary(categories)}>
           {" "}
