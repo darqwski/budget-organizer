@@ -9,4 +9,6 @@ export const colors = {
   ternary: "#DBF2B6",
   warning: "#F4C107",
   error: "#FF0707",
+  red: "#FF1010",
+  green: "#20AA20",
 }

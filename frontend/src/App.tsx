@@ -30,6 +30,7 @@ const App = () => {
         </Layout.Content>
         <Layout.Footer>Footer</Layout.Footer>
       </Layout>
+      <div className="text-red-100 text-green"></div>
     </ConfigProvider>
   )
 }

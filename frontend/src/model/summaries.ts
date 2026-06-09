@@ -1,9 +1,9 @@
-import type { Category } from "./categories.ts"
+import type { Category, UICategory } from "./categories.ts"
 import type { User } from "./users.ts"
 
 export interface SummaryEntry {
-  originalCategory: Category
-  currentCategory: Category
+  originalCategory: UICategory
+  currentCategory: UICategory
   value: number
 }
 

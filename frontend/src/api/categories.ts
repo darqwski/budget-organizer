@@ -1,10 +1,18 @@
 import { http } from "./http.ts"
-import type { Category, CategoryToAdd } from "../model/categories.ts"
+import type {
+  Category,
+  CategoryToAdd,
+  UICategory,
+} from "../model/categories.ts"
+import { getColorForCategory } from "../utils/colors.ts"
 
-export const fetchCategories = async (): Promise<Category[]> => {
-  const { data } = await http.get("/categories")
+export const fetchCategories = async (): Promise<UICategory[]> => {
+  const { data } = await http.get<Category[]>("/categories")
 
-  return data
+  return data.map((category, index) => ({
+    ...category,
+    color: getColorForCategory(index, data),
+  }))
 }
 export const mutateAddCategory = async (
   categoryToAdd: CategoryToAdd
@@ -12,8 +20,6 @@ export const mutateAddCategory = async (
   const { data } = await http.post("/categories", {
     categoriesToAdd: [categoryToAdd],
   })
-
-  return data
 }
 
 export const mutateArchiveCategory = async (
@@ -22,6 +28,4 @@ export const mutateArchiveCategory = async (
   const { data } = await http.delete("/categories", {
     category,
   })
-
-  return data
 }
