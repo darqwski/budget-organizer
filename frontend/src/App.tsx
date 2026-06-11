@@ -9,8 +9,15 @@ import AppToolbar from "./components/AppToolbar/AppToolbar.tsx"
 import { colors } from "./constants/colors.ts"
 import LoginPage from "./pages/login-page/LoginPage.tsx"
 import BudgetDashboardPage from "./pages/organize-budget-pages/budget-dashboard-page/BudgetDashboardPage.tsx"
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
+import { useEffect } from "react"
+import StatisticsPage from "./pages/statistics-page/StatisticsPage.tsx"
 
 const App = () => {
+  useEffect(() => {
+    ChartJS.register(ArcElement, Tooltip, Legend)
+  }, [])
+
   return (
     <ConfigProvider
       theme={{
@@ -44,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: "manage-categories",
         Component: ManageCategoriesPage,
+      },
+      {
+        path: "statistics",
+        Component: StatisticsPage,
       },
       {
         path: "login",

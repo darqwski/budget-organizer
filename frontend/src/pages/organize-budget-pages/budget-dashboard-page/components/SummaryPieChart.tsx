@@ -1,17 +1,20 @@
 import type { UICategory } from "../../../../model/categories.ts"
 import type { Summary, SummaryEntry } from "../../../../model/summaries.ts"
 import { useCategoriesFromServer } from "../../../../api-hooks/categories.ts"
-
-type ChartEntry = {
-  percentageStart: number
-  percentageStop: number
-  category: UICategory
-}
+import { Pie } from "react-chartjs-2"
+import {
+  Chart,
+  type ChartData,
+  type ChartDataset,
+  type ChartOptions,
+} from "chart.js"
+import { useRef } from "react"
+import { formatMoney } from "../../../../utils/format-money.ts"
 
 const processEntriesForChart = (
   entries: SummaryEntry[],
   categories: UICategory[]
-): ChartEntry[] => {
+): ChartData<"pie"> => {
   const uICategoryById = Object.fromEntries(
     categories.map((category) => [category.categoryId, category])
   )
@@ -21,57 +24,75 @@ const processEntriesForChart = (
       a.currentCategory.name.localeCompare(b.currentCategory.name)
     )
 
-  const sumOfCostEntries = costEntries
-    .filter((entry) => entry.value < 0)
-    .reduce((acc, item) => acc + item.value, 0)
+  const uniqueCategoryIds = Array.from(
+    new Set(
+      costEntries.map((costEntry) => costEntry.currentCategory.categoryId)
+    )
+  )
 
-  let accumulator = 0
+  const uiCategories = uniqueCategoryIds.map(
+    (categoryId) => uICategoryById[categoryId]
+  )
 
-  return costEntries.map((entry) => {
-    const accumulatorForEntry = accumulator
-    const percentage = (entry.value * 100) / sumOfCostEntries
-    accumulator += percentage
+  const dataset: ChartDataset<"pie"> = {
+    data: costEntries.map((costEntry) => costEntry.value),
+    backgroundColor: uiCategories.map((category) => category.color),
+  }
 
-    return {
-      percentageStart: accumulatorForEntry,
-      percentageStop: accumulator,
-      category:
-        uICategoryById[entry.currentCategory.categoryId] ??
-        entry.currentCategory,
-      accumulator: accumulatorForEntry,
-    }
-  })
-}
-
-const mapChartEntriesToStyle = (entries: ChartEntry[]) => {
   return {
-    background: `conic-gradient(${entries.map((entry) => `${entry.category.color} ${entry.percentageStart}% ${entry.percentageStop}%`).join(", ")})`,
+    datasets: [dataset],
+    labels: uiCategories.map((category) => category.name),
   }
 }
 
 const SummaryPieChart = ({
   summary,
   className,
+  withLegend = false,
 }: {
   summary: Summary
   className?: string
+  withLegend?: boolean
 }) => {
   const { categories } = useCategoriesFromServer()
-  const entriesForChart = processEntriesForChart(
-    summary.entries,
-    categories ?? []
-  )
+  const ref = useRef<Chart<"pie"> | null>(null)
+  if (!categories) {
+    return null
+  }
+
+  const chartData = processEntriesForChart(summary.entries, categories ?? [])
+
+  const options: ChartOptions<"pie"> = {
+    plugins: {
+      legend: {
+        display: withLegend,
+        labels: {},
+        align: "start",
+        position: "bottom",
+      },
+      tooltip: {
+        boxPadding: 5,
+        bodyFont: { weight: "bold" },
+        callbacks: {
+          label: (tooltipItem) => {
+            return formatMoney(Math.abs(+tooltipItem.formattedValue))
+          },
+        },
+      },
+    },
+    layout: {
+      padding: 0,
+    },
+  }
 
   return (
-    <div
-      className={[
-        "aspect-square border-2 border-black border-solid rounded-full",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      style={mapChartEntriesToStyle(entriesForChart)}
-    ></div>
+    <Pie
+      ref={ref}
+      options={options}
+      id={`${summary.summaryId}`}
+      className={className}
+      data={chartData}
+    ></Pie>
   )
 }
 

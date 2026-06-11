@@ -30,12 +30,15 @@ const SummaryEntryComparison = ({
 
   return (
     <dl
-      className={["flex items-center gap-4 font-semibold", className].join(" ")}
+      className={[
+        "flex items-center gap-4 font-semibold w-full",
+        className,
+      ].join(" ")}
     >
-      <dd className="flex-grow w-1/2 text-right overflow-hidden text-ellipsis whitespace-nowrap">
+      <dd className="text-left overflow-hidden text-ellipsis whitespace-nowrap">
         {t(category.name)}
       </dd>
-      <dt className="flex-grow  w-1/2 text-left">
+      <dt className="flex-grow overflow-hidden text-ellipsis whitespace-nowrap text-right">
         {formatMoney(value)}
         {percentage ? ` (${(percentage * 100).toFixed(2)}%)` : null}
       </dt>
