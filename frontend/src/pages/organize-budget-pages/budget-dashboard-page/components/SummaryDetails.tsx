@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next"
 import SummaryPieChart from "./SummaryPieChart.tsx"
 import { formatMoney } from "../../../../utils/format-money.ts"
 import SummaryEntryComparison from "./SummaryEntryComparison.tsx"
+import CategoryLegendTile from "./CategoryLegendTile.tsx"
 
 type ComparisonEntry = {
   previousEntry: SummaryEntry | undefined
@@ -73,6 +74,13 @@ const SummaryDetails = ({
       <div className="flex gap-2">
         <Card className="flex-grow w-1/3 flex flex-col gap-4">
           <SummaryPieChart summary={summary} />
+          {/* Use UI Category*/}
+          {sortedSummaryEntries.map((entry) => (
+            <CategoryLegendTile
+              key={entry.currentCategory.categoryId}
+              category={entry.currentCategory}
+            />
+          ))}
         </Card>
         <Card className="flex-grow w-1/3">
           {sortedSummaryEntries.map((entry) => (
