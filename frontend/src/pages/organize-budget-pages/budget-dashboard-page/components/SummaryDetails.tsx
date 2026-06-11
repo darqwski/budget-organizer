@@ -105,7 +105,6 @@ const SummaryDetails = ({
           ) : (
             <div>{t("Nothing to compare")}</div>
           )}
-          <p>// TODO prepare view for comparing specific categories</p>
         </Card>
       </div>
     </div>
