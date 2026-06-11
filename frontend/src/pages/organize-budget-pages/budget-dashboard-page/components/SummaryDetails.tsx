@@ -7,6 +7,7 @@ import SummaryPieChart from "./SummaryPieChart.tsx"
 import { formatMoney } from "../../../../utils/format-money.ts"
 import SummaryEntryComparison from "./SummaryEntryComparison.tsx"
 import CategoryLegendTile from "./CategoryLegendTile.tsx"
+import { useCategoriesFromServer } from "../../../../api-hooks/categories.ts"
 
 type ComparisonEntry = {
   previousEntry: SummaryEntry | undefined
@@ -56,11 +57,18 @@ const SummaryDetails = ({
   setActiveSummary: Dispatch<SetStateAction<Summary | undefined>>
 }) => {
   const { t } = useTranslation()
+  const { categories } = useCategoriesFromServer()
   const sortedSummaryEntries = summary.entries.toSorted(
     (a, b) => a.value - b.value
   )
+  const categoryIdsFromSummary = summary.entries.map(
+    (entry) => entry.currentCategory.categoryId
+  )
   const comparisonEntries = createComparisonEntries(summary, previousSummary)
-
+  const uiCategoriesFromSummary =
+    categories?.filter((category) =>
+      categoryIdsFromSummary.includes(category.categoryId)
+    ) ?? []
   const className = [
     "font-semibold flex-grow w-1/2 text-left",
     summary.balance > 0 ? "text-green" : "text-red",
@@ -75,11 +83,8 @@ const SummaryDetails = ({
         <Card className="flex-grow w-1/3 flex flex-col gap-4">
           <SummaryPieChart summary={summary} />
           {/* Use UI Category*/}
-          {sortedSummaryEntries.map((entry) => (
-            <CategoryLegendTile
-              key={entry.currentCategory.categoryId}
-              category={entry.currentCategory}
-            />
+          {uiCategoriesFromSummary.map((entry) => (
+            <CategoryLegendTile key={entry.categoryId} category={entry} />
           ))}
         </Card>
         <Card className="flex-grow w-1/3">
