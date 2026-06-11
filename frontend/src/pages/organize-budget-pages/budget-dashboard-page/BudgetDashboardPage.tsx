@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next"
 import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 import DebugUtils from "../../../components/DebugUtils.tsx"
 import { http } from "../../../api/http.ts"
@@ -13,6 +12,7 @@ import type { Category } from "../../../model/categories.ts"
 import { useState } from "react"
 import SummaryList from "./components/SummaryList.tsx"
 import SummaryDetails from "./components/SummaryDetails.tsx"
+import { useSummariesFromServer } from "../../../api-hooks/summaries.ts"
 
 const addDebugSummary = async (categories: Category[] | null) => {
   if (!categories) {
@@ -54,15 +54,48 @@ const addDebugSummary = async (categories: Category[] | null) => {
   }
   await http.post("/summaries/", { summaryToAdd })
 }
+const findPreviousSummary = (
+  activeSummary: Summary | undefined,
+  allSummaries: Summary[] | null
+) => {
+  if (!activeSummary || !allSummaries) {
+    return undefined
+  }
+  const activeSummaryDate = new Date(activeSummary.created)
 
+  return allSummaries.reduce<Summary | undefined>(
+    (closestSummary, summary, iteration) => {
+      const summaryDate = new Date(summary.created)
+      const beforeActiveSummary =
+        summaryDate.getTime() < activeSummaryDate.getTime()
+
+      if (!beforeActiveSummary) {
+        return closestSummary
+      }
+
+      if (!closestSummary) {
+        return summary
+      }
+
+      return new Date(closestSummary.created).getTime() < summaryDate.getTime()
+        ? summary
+        : closestSummary
+    },
+    undefined
+  )
+}
 const BudgetDashboardPage = () => {
   const { categories } = useCategoriesFromServer()
+  const { summaries } = useSummariesFromServer()
   const [activeSummary, setActiveSummary] = useState<undefined | Summary>()
+
+  const previousSummary = findPreviousSummary(activeSummary, summaries)
 
   return (
     <PageWrapper>
       {activeSummary ? (
         <SummaryDetails
+          previousSummary={previousSummary}
           summary={activeSummary}
           setActiveSummary={setActiveSummary}
         />
@@ -71,10 +104,7 @@ const BudgetDashboardPage = () => {
       )}
 
       <DebugUtils>
-        <button onClick={() => addDebugSummary(categories)}>
-          {" "}
-          Add summary{" "}
-        </button>
+        <button onClick={() => addDebugSummary(categories)}>Add summary</button>
       </DebugUtils>
     </PageWrapper>
   )
