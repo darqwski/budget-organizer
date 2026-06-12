@@ -1,4 +1,4 @@
-import { Divider } from "antd"
+import { Button, Card, Divider, Form, Input } from "antd"
 import { useReviewed } from "../../../global-store/reviewed.ts"
 import type { Category } from "../../../model/categories.ts"
 import type { Reviewed } from "../../../model/reviewed.ts"
@@ -7,6 +7,17 @@ import { useTranslation } from "react-i18next"
 import ValueDesc from "../../../components/ValueDesc/ValueDesc.tsx"
 import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+  summarySchema,
+  type SummarySchema,
+} from "../../../schemas/summary.schema.ts"
+import ErrorMessage from "../../../components/Form/ErrorMessage/ErrorMessage.tsx"
+import type { SummaryToAdd } from "../../../model/summaries.ts"
+import { http } from "../../../api/http.ts"
+import { useSummariesFromServer } from "../../../api-hooks/summaries.ts"
+import { useNavigate } from "react-router"
 
 type CategorySummary = {
   category: Category
@@ -18,7 +29,9 @@ type CategorySummary = {
 const SummaryBudgetPage = () => {
   const { reviewed } = useReviewed()
   const { categories } = useCategoriesFromServer()
+  const { refreshSummaries } = useSummariesFromServer()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const initialMap = (categories || []).reduce<Record<string, CategorySummary>>(
     (acc, category) => {
       acc[category.categoryId] = {
@@ -32,21 +45,27 @@ const SummaryBudgetPage = () => {
     },
     {}
   )
-  const summaryByCategoryId = reviewed.reduce<Record<string, CategorySummary>>(
-    (acc, reviewed) => {
-      acc[reviewed.category.categoryId].items.push(reviewed)
-      acc[reviewed.category.categoryId].sum += reviewed.reviewable.money
-      if (reviewed.reviewable.currency) {
-        acc[reviewed.category.categoryId].currency =
-          reviewed.reviewable.currency
-      }
 
-      return acc
+  const { handleSubmit, control } = useForm<SummarySchema>({
+    resolver: zodResolver(summarySchema),
+    defaultValues: {
+      title: "",
+      description: "",
     },
-    initialMap
-  )
+  })
+  const categorySummaryByCategoryId = reviewed.reduce<
+    Record<string, CategorySummary>
+  >((acc, reviewed) => {
+    acc[reviewed.category.categoryId].items.push(reviewed)
+    acc[reviewed.category.categoryId].sum += reviewed.reviewable.money
+    if (reviewed.reviewable.currency) {
+      acc[reviewed.category.categoryId].currency = reviewed.reviewable.currency
+    }
 
-  const summaries = Object.values(summaryByCategoryId).sort((a, b) => {
+    return acc
+  }, initialMap)
+
+  const summaries = Object.values(categorySummaryByCategoryId).sort((a, b) => {
     return a.sum - b.sum
   })
 
@@ -74,32 +93,103 @@ const SummaryBudgetPage = () => {
     }
   )
 
+  const saveSummary = async ({ title, description }: SummarySchema) => {
+    const summaryToAdd: SummaryToAdd = {
+      description,
+      title,
+      entries: summaries.map((summary) => ({
+        category: summary.category,
+        value: summary.sum,
+      })),
+    }
+    await http.post("/summaries/", { summaryToAdd })
+    refreshSummaries()
+    navigate("../")
+  }
+  const cancelSummary = () => {
+    navigate("../")
+  }
+
   return (
     <PageWrapper>
-      <div className="flex flex-col items-center">
-        {summaries.map((summary) => (
+      <div className="w-full h-full flex flex-row gap-4">
+        <Card className="flex w-1/2 flex-col items-center">
+          {summaries.map((summary) => (
+            <ValueDesc
+              className="w-full"
+              key={summary.category.name}
+              value={`${formatMoney(summary.sum, summary.currency)} ${summary.items.length} ${t("items")}`}
+              desc={summary.category.name}
+              variant="space-between"
+            />
+          ))}
+          <Divider />
+          <ValueDesc className="w-full" value={income} desc={t("Income")} />
+          <ValueDesc className="w-full" value={costs} desc={t("Costs")} />
           <ValueDesc
             className="w-full"
-            key={summary.category.name}
-            value={formatMoney(summary.sum, summary.currency)}
-            desc={summary.category.name}
+            value={income + costs}
+            desc={t("Total")}
           />
-        ))}
-      </div>
-      <Divider />
-      <div className="flex flex-col items-center">
-        <ValueDesc className="w-full" value={income} desc={t("Income")} />
-        <ValueDesc className="w-full" value={costs} desc={t("Costs")} />
-        <Divider />
-        <ValueDesc
-          className="w-full"
-          value={income + costs}
-          desc={t("Total")}
-        />
-      </div>
-      <Divider />
-      <div className="flex flex-col items-center">
-        <ValueDesc className="w-full" value={allItems} desc={t("All items")} />
+          <ValueDesc
+            className="w-full"
+            value={allItems}
+            desc={t("All items")}
+          />
+          <Divider />
+          <form
+            className="flex flex-col gap-1"
+            onSubmit={handleSubmit(saveSummary)}
+          >
+            <Controller
+              control={control}
+              name="title"
+              render={(controller) => {
+                const error = controller.formState.errors[controller.field.name]
+
+                return (
+                  <Form.Item label={t("Summary title")}>
+                    <Input {...controller.field} />
+                    {error?.message && (
+                      <ErrorMessage message={String(error.message)} />
+                    )}
+                  </Form.Item>
+                )
+              }}
+            />
+            <Controller
+              control={control}
+              name="description"
+              render={(controller) => {
+                const error = controller.formState.errors[controller.field.name]
+
+                return (
+                  <Form.Item label={t("Summary description")}>
+                    <Input.TextArea {...controller.field} />
+                    {error?.message && (
+                      <ErrorMessage message={String(error.message)} />
+                    )}
+                  </Form.Item>
+                )
+              }}
+            />
+            <div className="flex gap-4">
+              <Button variant="solid" htmlType="submit">
+                {t("Save summary")}
+              </Button>
+              <Button onClick={cancelSummary}>{t("Cancel")}</Button>
+            </div>
+          </form>
+        </Card>
+        <Card className="flex w-1/2 flex-col items-center">
+          <p>{t("Adjust summary")}</p>
+          <p>
+            TODO
+            {t(
+              "Select category that does not look right and review all items within"
+            )}
+          </p>
+        </Card>
       </div>
     </PageWrapper>
   )
