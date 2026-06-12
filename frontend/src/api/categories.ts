@@ -17,7 +17,7 @@ export const fetchCategories = async (): Promise<UICategory[]> => {
 export const mutateAddCategory = async (
   categoryToAdd: CategoryToAdd
 ): Promise<void> => {
-  const { data } = await http.post("/categories", {
+  await http.post("/categories", {
     categoriesToAdd: [categoryToAdd],
   })
 }
@@ -25,7 +25,7 @@ export const mutateAddCategory = async (
 export const mutateArchiveCategory = async (
   category: Category
 ): Promise<void> => {
-  const { data } = await http.delete("/categories", {
+  await http.delete("/categories", {
     category,
   })
 }

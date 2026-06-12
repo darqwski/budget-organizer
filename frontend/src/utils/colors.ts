@@ -6,5 +6,6 @@ export const getColorForCategory = (
 ) => {
   const step = 360 / allCategories.length
   const anyFirstNumber = 17 // Just to make colors more random
-  return `hsl(${(index * step * anyFirstNumber + 100) % 360}deg, 79%, 78%)`
+
+  return `hsl(${(index * step * anyFirstNumber + 100) % 360}deg, 82%, 57%)`
 }

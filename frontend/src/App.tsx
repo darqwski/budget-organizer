@@ -9,13 +9,30 @@ import AppToolbar from "./components/AppToolbar/AppToolbar.tsx"
 import { colors } from "./constants/colors.ts"
 import LoginPage from "./pages/login-page/LoginPage.tsx"
 import BudgetDashboardPage from "./pages/organize-budget-pages/budget-dashboard-page/BudgetDashboardPage.tsx"
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+} from "chart.js"
 import { useEffect } from "react"
 import StatisticsPage from "./pages/statistics-page/StatisticsPage.tsx"
 
 const App = () => {
   useEffect(() => {
-    ChartJS.register(ArcElement, Tooltip, Legend)
+    ChartJS.register(
+      ArcElement,
+      Tooltip,
+      Legend,
+      LineElement,
+      CategoryScale,
+      LinearScale,
+      PointElement
+    )
   }, [])
 
   return (
