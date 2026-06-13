@@ -4,11 +4,10 @@ import { Summary } from "../../model/summary"
 
 export const insertSummaryIntoDB = async (
   summary: Summary
-): Promise<Category[]> => {
+): Promise<string | null> => {
   try {
-    console.log({ summary })
     const result = await pool.query(
-      `INSERT INTO summaries (user_id, title, description, entries, balance, original_limits_exceeded, original_limits_met, current_limits_exceeded, current_limits_met, created) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, current_timestamp);`,
+      `INSERT INTO summaries (user_id, title, description, entries, balance, original_limits_exceeded, original_limits_met, current_limits_exceeded, current_limits_met, created) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, current_timestamp) RETURNING summary_id;`,
       [
         summary.user.userId,
         summary.title,
@@ -22,7 +21,7 @@ export const insertSummaryIntoDB = async (
       ]
     )
 
-    return result.rows
+    return result.rows[0]?.summary_id || null
   } catch (error) {
     throw error
   }

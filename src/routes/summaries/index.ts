@@ -80,12 +80,12 @@ router.post(
       }
       const categories = await getActiveCategoriesFromDB(user)
 
-      console.log("categories for mmaping summary", categories.length)
+      console.log("categories for mapping summary", categories.length)
       const summary = mapSummaryToAddToSummary(summaryToAdd, user, categories)
 
-      await insertSummaryIntoDB(summary)
+      const summaryId = await insertSummaryIntoDB(summary)
 
-      res.status(200).json({ message: "Success" })
+      res.status(200).json({ summaryId })
     } catch (error) {
       next(error)
     }
