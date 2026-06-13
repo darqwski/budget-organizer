@@ -8,7 +8,6 @@ const ASSIGNMENT_BATCH_SIZE = 1000
 
 export const insertAssignmentsIntoDB = async (
   assignments: AssignmentToAdd[],
-  summaryId: number,
   user: User
 ): Promise<number> => {
   const assignmentBatches = assignments.reduce<AssignmentToAdd[][]>(
@@ -40,13 +39,12 @@ export const insertAssignmentsIntoDB = async (
     for (const batch of assignmentBatches) {
       const listOfParameters = batch.map((assignment) => [
         user.userId,
-        summaryId,
+        assignment.summaryId,
         assignment.categoryId,
         assignment.payment,
-        Date.now(),
       ])
 
-      let counter = 0
+      let counter = 1
       let valuesList: string[] = []
       for (const parameters of listOfParameters) {
         const values = []
@@ -54,20 +52,21 @@ export const insertAssignmentsIntoDB = async (
           values.push(`$${counter}`)
           counter += 1
         }
-        valuesList.push(`(${values.join(", ")})`)
+        valuesList.push(`(${values.join(", ")}, current_timestamp)`)
       }
 
       const result = await pool.query(
         `INSERT INTO assignments (user_id, summary_id, category_id, payment, created) VALUES ${valuesList.join(" ,")};`,
         listOfParameters.flat()
       )
-      const { rows, ...rest } = result
-      console.log("Added rows: ", rows.length)
-      addedRows += rows.length
+      const { rowCount, ...rest } = result
+      console.log("Added rows: ", rowCount)
 
-      if (result.rows.length !== batch.length) {
+      if (rowCount !== batch.length) {
         console.log(JSON.stringify(rest))
         throw new Error("Not all assignments added to database")
+      } else {
+        addedRows += rowCount
       }
     }
 

@@ -45,7 +45,7 @@ const ManageCategoriesPage = () => {
   }, [categoryToArchive, refreshCategories])
 
   const onDeleteClick = useCallback(
-    (categoryId: string) => {
+    (categoryId: number) => {
       const categoryToArchive = categories?.find(
         (entry) => entry.categoryId === categoryId
       )
@@ -74,7 +74,7 @@ const ManageCategoriesPage = () => {
         title: t("Actions"),
         dataIndex: "categoryId",
         key: "actions",
-        render: (categoryId: string) => (
+        render: (categoryId: number) => (
           <Button
             size="small"
             type="primary"

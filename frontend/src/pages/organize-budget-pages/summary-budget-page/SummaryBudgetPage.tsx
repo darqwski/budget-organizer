@@ -18,12 +18,28 @@ import type { SummaryToAdd } from "../../../model/summaries.ts"
 import { http } from "../../../api/http.ts"
 import { useSummariesFromServer } from "../../../api-hooks/summaries.ts"
 import { useNavigate } from "react-router"
+import { addSummaries } from "../../../api/summaries.ts"
+import type { AssignmentToAdd } from "../../../model/assignment.ts"
 
 type CategorySummary = {
   category: Category
   items: Reviewed[]
   sum: number
   currency: string
+}
+
+const mapReviewedToAssignmentToAdd = (
+  reviewedList: Reviewed[],
+  summaryId: number
+): AssignmentToAdd[] => {
+  return reviewedList.map((reviewed) => {
+    const { details, date, ...rest } = reviewed.reviewable
+    return {
+      summaryId,
+      categoryId: reviewed.category.categoryId,
+      payment: { ...rest, ...details, date: date?.getTime() ?? null },
+    }
+  })
 }
 
 const SummaryBudgetPage = () => {
@@ -102,10 +118,16 @@ const SummaryBudgetPage = () => {
         value: summary.sum,
       })),
     }
-    await http.post("/summaries/", { summaryToAdd })
+    const summaryId = await addSummaries(summaryToAdd)
+
+    await http.post("/assignments/", {
+      assignmentsToAdd: mapReviewedToAssignmentToAdd(reviewed, summaryId),
+    })
+
     refreshSummaries()
     navigate("../")
   }
+
   const cancelSummary = () => {
     navigate("../")
   }

@@ -1,33 +1,27 @@
 import { Request, Response, NextFunction, Router } from "express"
 import { getUserFromRequest } from "../../utils/cookies"
-import { getSummariesFromDB } from "../../database/summaries/get-summaries"
 import { AssignmentToAdd } from "../../model/assignment"
 import { insertAssignmentsIntoDB } from "../../database/assignments/add-assignments"
 import { getAssignmentsFromDB } from "../../database/assignments/get-assignments"
 
-const router = Router()
+const assignmentRouter = Router()
 
-router.post(
+assignmentRouter.post(
   "/",
   async (
-    req: Request<
-      any,
-      any,
-      { assignmentsToAdd: AssignmentToAdd[]; summaryId: number }
-    >,
+    req: Request<any, any, { assignmentsToAdd: AssignmentToAdd[] }>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const user = getUserFromRequest(req)
-      const { assignmentsToAdd, summaryId } = req.body
+      const { assignmentsToAdd } = req.body
 
       if (!user) {
         return res.status(401).json({ message: "Unauthorized" })
       }
-      const insertedAssignments = insertAssignmentsIntoDB(
+      const insertedAssignments = await insertAssignmentsIntoDB(
         assignmentsToAdd,
-        summaryId,
         user
       )
 
@@ -38,20 +32,23 @@ router.post(
   }
 )
 
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const user = getUserFromRequest(req)
+assignmentRouter.get(
+  "/",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = getUserFromRequest(req)
 
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized" })
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" })
+      }
+
+      const assignments = await getAssignmentsFromDB(user)
+
+      res.status(200).json(assignments)
+    } catch (error) {
+      next(error)
     }
-
-    const assignments = await getAssignmentsFromDB(user)
-
-    res.status(200).json(assignments)
-  } catch (error) {
-    next(error)
   }
-})
+)
 
-export default router
+export default assignmentRouter
