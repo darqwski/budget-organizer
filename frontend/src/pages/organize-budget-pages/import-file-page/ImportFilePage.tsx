@@ -24,13 +24,21 @@ const ImportFilePage = () => {
         return
       }
       clearReviewed()
-      if (file.type === "application/vnd.ms-excel") {
+      console.log(file.type)
+      if (
+        [
+          "application/vnd.ms-excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ].includes(file.type)
+      ) {
         setReviewable(await mapPKOBPExcelToJson(file))
       } else if (file.type === "text/csv") {
         setReviewable(await mapPKOBPCSVToJson(file))
       }
     }
-    reader.onerror = function () {}
+    reader.onerror = (error) => {
+      console.error(error)
+    }
     reader.readAsText(file, "UTF-8")
   }
 

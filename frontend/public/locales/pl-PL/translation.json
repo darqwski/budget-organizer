@@ -15,5 +15,11 @@
   "Costs": "Wydatki",
   "Total": "Bilans",
   "Login": "Login",
-  "Password": "Hasło"
+  "Password": "Hasło",
+  "Logout": "Wyloguj",
+  "View statistics": "Wykresy i statystyki",
+  "For budgets or categories": "Dla budżetów i kategorii",
+  "Add random summary": "Dodaj losowy budżet",
+  "Add new summary": "Dodaj nowe podsumowanie",
+  "Organize budget": "Organizuj budżet"
 }
