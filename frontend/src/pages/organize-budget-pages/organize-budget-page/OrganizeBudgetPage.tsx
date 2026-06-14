@@ -34,12 +34,19 @@ const OrganizeBudgetPage = () => {
       return
     }
 
-    const suggestedAssignmentRule = suggestNewAssignmentRule(
+    const suggestedAssignmentRules = suggestNewAssignmentRule(
       assignments || [],
       currentlyReviewing,
       category.categoryId
     )
-    console.log({ suggestedAssignmentRule })
+    if (suggestedAssignmentRules.length > 0) {
+      // TODO
+      // Show popup one by one,
+      // if user accepts, add to the assignment-rule table
+      // If not, also add it, but with reduced score by 100
+    }
+
+    console.log({ suggestedAssignmentRules })
     const lastReviewable = reviewable.length === 1
 
     addReviewed({ reviewable: { ...currentlyReviewing }, category })

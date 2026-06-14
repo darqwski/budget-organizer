@@ -1,6 +1,6 @@
 export interface Reviewable {
   id: string
-  date: Date | null
+  date: number | null
   money: number
   currency: string
   details: Record<string, string>

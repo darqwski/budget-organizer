@@ -1,9 +1,10 @@
 import type { Summary } from "./summaries.ts"
+import type { PaymentDetailsValue } from "./assignment.ts"
 
 export type ComparisonRule = {
   ruleName: "string-match"
   ruleValues: Record<string, string | number>
-  value: string | number
+  value: PaymentDetailsValue
 }
 
 export type MinimalPaymentComparison = Record<string, ComparisonRule>

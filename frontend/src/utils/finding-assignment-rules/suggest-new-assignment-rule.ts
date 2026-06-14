@@ -66,13 +66,17 @@ const createInitialAssignmentScoreEntry = (
 export const getListOfPaymentCombinations = (
   payment: Assignment["payment"]
 ): string[][] => {
-  const paymentEntriesWithValue = Object.entries(payment).filter(
-    ([, value]) => value
+  const paymentEntriesWithValue = Object.keys(payment).filter(
+    (key) => payment[key as keyof Assignment["payment"]]
   )
+  console.log({ paymentEntriesWithValue })
+  console.log({ KEYS_TO_SKIP })
   // Omitting values which will be different for every payment which does not make sense to add them to score table
-  const paymentKeys = Object.keys(paymentEntriesWithValue).filter(
+  const paymentKeys = paymentEntriesWithValue.filter(
     (key) => !KEYS_TO_SKIP.includes(key)
   )
+  console.log({ paymentKeys: paymentKeys.length })
+
   return getListOfCombinations(paymentKeys)
 }
 
@@ -122,7 +126,7 @@ export const compareAssignmentToAssignmentScoreEntry = (
     }
     if (minimalPaymentComparisonRule.ruleName === "string-match") {
       const jaro = jaroDistance(
-        assignmentValue,
+        `${assignmentValue}`,
         minimalPaymentComparisonRule.value as string
       )
 
@@ -168,7 +172,7 @@ export const suggestNewAssignmentRule = (
   previousAssignments: Assignment[],
   currentlyReviewing: Reviewable,
   categoryId: number
-): AssignmentRuleToAdd => {
+): AssignmentRuleToAdd[] => {
   const currentAssignment = mapRevieableToAssignmentToAdd(
     currentlyReviewing,
     categoryId
@@ -182,5 +186,8 @@ export const suggestNewAssignmentRule = (
   fillScoreTableWithAssignments(assignmentScoreTable, previousAssignments) // Have to cache it to not loose already added assignment
   //fillScoreTableWithAssignments(assignmentScoreTable, [currentAssignment]) //
 
+  // findSamePaymentButDifferentCategory - this will be to find out if user accidentally match with different category, but will have to allow him to do it, maybe by acknowledged_wrong_assignments (new table, entities and matching)?
+  // Nah, lets just reduce amount of points after normal flow
+  // Need to create user diagrams for that :<
   //findAssignmentRulesBiggerThan3
 }

@@ -39,7 +39,7 @@ export const mapRevieableToAssignmentToAdd = (
   return {
     summaryId,
     categoryId: categoryId,
-    payment: { ...rest, ...details, date: date?.getTime() ?? null },
+    payment: { ...rest, ...details, date },
   }
 }
 
