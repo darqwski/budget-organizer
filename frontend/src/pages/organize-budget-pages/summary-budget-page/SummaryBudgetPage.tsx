@@ -20,6 +20,7 @@ import { useSummariesFromServer } from "../../../api-hooks/summaries.ts"
 import { useNavigate } from "react-router"
 import { addSummaries } from "../../../api/summaries.ts"
 import type { AssignmentToAdd } from "../../../model/assignment.ts"
+import type { Reviewable } from "../../../model/reviewable.ts"
 
 type CategorySummary = {
   category: Category
@@ -28,18 +29,31 @@ type CategorySummary = {
   currency: string
 }
 
-const mapReviewedToAssignmentToAdd = (
+// TODO do something with util, its used across the app
+export const mapRevieableToAssignmentToAdd = (
+  reviewable: Reviewable,
+  categoryId: number,
+  summaryId: number = -1
+): AssignmentToAdd => {
+  const { details, date, ...rest } = reviewable
+  return {
+    summaryId,
+    categoryId: categoryId,
+    payment: { ...rest, ...details, date: date?.getTime() ?? null },
+  }
+}
+
+export const mapReviewedToAssignmentToAdd = (
   reviewedList: Reviewed[],
   summaryId: number
 ): AssignmentToAdd[] => {
-  return reviewedList.map((reviewed) => {
-    const { details, date, ...rest } = reviewed.reviewable
-    return {
-      summaryId,
-      categoryId: reviewed.category.categoryId,
-      payment: { ...rest, ...details, date: date?.getTime() ?? null },
-    }
-  })
+  return reviewedList.map((reviewed) =>
+    mapRevieableToAssignmentToAdd(
+      reviewed.reviewable,
+      reviewed.category.categoryId,
+      summaryId
+    )
+  )
 }
 
 const SummaryBudgetPage = () => {

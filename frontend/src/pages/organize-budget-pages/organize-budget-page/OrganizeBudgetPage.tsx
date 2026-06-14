@@ -9,10 +9,13 @@ import { useTranslation } from "react-i18next"
 import DebugUtils from "../../../components/DebugUtils.tsx"
 import PageWrapper from "../../../components/PageWrapper/PageWrapper.tsx"
 import { useCategoriesFromServer } from "../../../api-hooks/categories.ts"
+import { useAssignmentsFromServer } from "../../../api-hooks/assignments.ts"
+import { suggestNewAssignmentRule } from "../../../utils/finding-assignment-rules/suggest-new-assignment-rule.ts"
 
 const OrganizeBudgetPage = () => {
   const { categories } = useCategoriesFromServer()
   const { reviewable, removeReviewable, moveFirstToEnd } = useReviewable()
+  const { assignments } = useAssignmentsFromServer()
   const { addReviewed } = useReviewed()
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -30,6 +33,13 @@ const OrganizeBudgetPage = () => {
     if (!currentlyReviewing) {
       return
     }
+
+    const suggestedAssignmentRule = suggestNewAssignmentRule(
+      assignments || [],
+      currentlyReviewing,
+      category.categoryId
+    )
+    console.log({ suggestedAssignmentRule })
     const lastReviewable = reviewable.length === 1
 
     addReviewed({ reviewable: { ...currentlyReviewing }, category })

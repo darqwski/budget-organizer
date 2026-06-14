@@ -1,3 +1,8 @@
+import type { Reviewable } from "./reviewable.ts"
+
+type AssignmentPayment = Record<string, number | string | null> &
+  Omit<Reviewable, "details">
+
 export interface Assignment {
   assignmentId: number
   summaryId: number
