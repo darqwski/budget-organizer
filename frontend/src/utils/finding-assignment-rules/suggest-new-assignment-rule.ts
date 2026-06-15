@@ -112,23 +112,6 @@ const addPaymentAndCategoryToAssignmentScoreTable = (
   }
 }
 
-export const createInitialScoreTableFromAssignments = (
-  assignments: Assignment[]
-): AssignmentScoreTable => {
-  const assignmentScoreTable: AssignmentScoreTable = {}
-
-  for (const assignment of assignments) {
-    const { payment, categoryId } = assignment
-    addPaymentAndCategoryToAssignmentScoreTable(
-      assignmentScoreTable,
-      categoryId,
-      payment
-    )
-  }
-
-  return assignmentScoreTable
-}
-
 /**
  *
  * Rule 1 - if assignment does not have key from comparison => false
@@ -224,7 +207,7 @@ export const suggestNewAssignmentRule = (
   const assignmentScoreTable: Record<
     string,
     AssignmentRuleToAdd & { score: number }
-  > = createInitialScoreTableFromAssignments(previousAssignments)
+  > = {}
 
   fillScoreTableWithAssignments(assignmentScoreTable, previousAssignments) // Have to cache it to not loose already added assignment
   fillScoreTableWithAssignments(assignmentScoreTable, [currentAssignment]) //
