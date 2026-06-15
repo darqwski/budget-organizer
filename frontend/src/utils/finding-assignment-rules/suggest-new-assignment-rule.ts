@@ -3,10 +3,15 @@ import type {
   ComparisonRule,
 } from "../../model/assignment-rule.ts"
 import type { Reviewable } from "../../model/reviewable.ts"
-import type { Assignment } from "../../model/assignment.ts"
+import type {
+  Assignment,
+  AssignmentToAdd,
+  PaymentDetails,
+} from "../../model/assignment.ts"
 import { mapRevieableToAssignmentToAdd } from "../../pages/organize-budget-pages/summary-budget-page/SummaryBudgetPage.tsx"
 import { getListOfCombinations } from "./get-list-of-combinations.ts"
 import { jaroDistance } from "./jaro-comparison.ts"
+import { JARO_THRESHOLD } from "../../constants/suggesting-values.ts"
 const KEYS_TO_SKIP: Omit<keyof Reviewable, "details">[] = [
   "id",
   "date",
@@ -16,7 +21,8 @@ const KEYS_TO_SKIP: Omit<keyof Reviewable, "details">[] = [
 
 const COMPARISON_RULES: ComparisonRule["ruleName"][] = ["string-match"]
 type AssignmentScoreEntry = AssignmentRuleToAdd & { score: number }
-type AssignmentScoreTable = Record<string, AssignmentScoreEntry>
+type ScoreTableKey = string
+type AssignmentScoreTable = Record<ScoreTableKey, AssignmentScoreEntry>
 
 /**
  *
@@ -42,11 +48,10 @@ type AssignmentScoreTable = Record<string, AssignmentScoreEntry>
  *  }
  */
 const createInitialAssignmentScoreEntry = (
-  assignment: Assignment,
+  payment: PaymentDetails,
+  categoryId: number,
   paymentKeyCombination: string[]
 ): AssignmentScoreEntry => {
-  const { payment, categoryId } = assignment
-
   return {
     score: 0,
     categoryId,
@@ -64,42 +69,62 @@ const createInitialAssignmentScoreEntry = (
 }
 
 export const getListOfPaymentCombinations = (
-  payment: Assignment["payment"]
+  payment: Partial<Assignment["payment"]>
 ): string[][] => {
   const paymentEntriesWithValue = Object.keys(payment).filter(
     (key) => payment[key as keyof Assignment["payment"]]
   )
-  console.log({ paymentEntriesWithValue })
-  console.log({ KEYS_TO_SKIP })
+
   // Omitting values which will be different for every payment which does not make sense to add them to score table
   const paymentKeys = paymentEntriesWithValue.filter(
     (key) => !KEYS_TO_SKIP.includes(key)
   )
-  console.log({ paymentKeys: paymentKeys.length })
 
   return getListOfCombinations(paymentKeys)
+}
+
+const createScoreTableKey = (
+  categoryId: number,
+  paymentKeyCombination: string[],
+  payment: PaymentDetails
+): ScoreTableKey =>
+  `${categoryId}-${[paymentKeyCombination.map((paymentKey) => [paymentKey, payment[paymentKey]].join("/")).join("-")]}`
+
+const addPaymentAndCategoryToAssignmentScoreTable = (
+  assignmentScoreTable: AssignmentScoreTable,
+
+  categoryId: number,
+  payment: PaymentDetails
+) => {
+  const paymentKeyCombinations = getListOfPaymentCombinations(payment)
+  for (const paymentKeyCombination of paymentKeyCombinations) {
+    // Maybe its worth to think about remodeling it from this string to object representing entries?
+    const key = createScoreTableKey(categoryId, paymentKeyCombination, payment)
+
+    if (assignmentScoreTable[key]) {
+      assignmentScoreTable[key].score += 1
+    } else {
+      assignmentScoreTable[key] = createInitialAssignmentScoreEntry(
+        payment,
+        categoryId,
+        paymentKeyCombination
+      )
+    }
+  }
 }
 
 export const createInitialScoreTableFromAssignments = (
   assignments: Assignment[]
 ): AssignmentScoreTable => {
   const assignmentScoreTable: AssignmentScoreTable = {}
+
   for (const assignment of assignments) {
     const { payment, categoryId } = assignment
-    const paymentKeyCombinations = getListOfPaymentCombinations(payment)
-    for (const paymentKeyCombination of paymentKeyCombinations) {
-      // Maybe its worth to think about remodeling it from this string to object representing entries?
-      const key = `${categoryId}-${[paymentKeyCombination.map((paymentKey) => [paymentKey, payment[paymentKey]].join("/")).join("-")]}`
-
-      if (assignmentScoreTable[key]) {
-        assignmentScoreTable[key].score += 1
-      } else {
-        assignmentScoreTable[key] = createInitialAssignmentScoreEntry(
-          assignment,
-          paymentKeyCombination
-        )
-      }
-    }
+    addPaymentAndCategoryToAssignmentScoreTable(
+      assignmentScoreTable,
+      categoryId,
+      payment
+    )
   }
 
   return assignmentScoreTable
@@ -112,7 +137,7 @@ export const createInitialScoreTableFromAssignments = (
  * Else return true
  */
 export const compareAssignmentToAssignmentScoreEntry = (
-  assignment: Assignment,
+  assignment: AssignmentToAdd,
   assignmentScoreEntry: AssignmentScoreEntry
 ): boolean => {
   for (const [
@@ -130,7 +155,7 @@ export const compareAssignmentToAssignmentScoreEntry = (
         minimalPaymentComparisonRule.value as string
       )
 
-      if (jaro < 0.8) {
+      if (jaro < JARO_THRESHOLD) {
         return false
       }
     } else {
@@ -143,11 +168,17 @@ export const compareAssignmentToAssignmentScoreEntry = (
 
 // Mutation based function!!
 export const fillScoreTableWithAssignments = (
-  scoreTable: AssignmentScoreTable,
-  assignments: Assignment[]
+  assignmentScoreTable: AssignmentScoreTable,
+  assignments: AssignmentToAdd[]
 ) => {
-  const assignmentScoreEntries = Object.values(scoreTable)
+  const assignmentScoreEntries = Object.values(assignmentScoreTable)
   for (const assignment of assignments) {
+    addPaymentAndCategoryToAssignmentScoreTable(
+      assignmentScoreTable,
+      assignment.categoryId,
+      assignment.payment
+    )
+
     const assignmentsForCategory = assignmentScoreEntries.filter(
       (assignmentScoreEntry) =>
         assignmentScoreEntry.categoryId === assignment.categoryId
@@ -165,9 +196,18 @@ export const fillScoreTableWithAssignments = (
   }
 }
 
+const findAssignmentRulesBiggerThanThreshold = (
+  scoreTable: AssignmentScoreTable,
+  threshold: number
+): AssignmentRuleToAdd[] => {
+  const scoreTableEntries = Object.values(scoreTable)
+
+  return scoreTableEntries.filter(
+    (scoreTableEntry) => scoreTableEntry.score > threshold
+  )
+}
 // This util is dedicated for suggesting not applying assignment rule
-// TODO write assignment rule for applying
-// TODO Write tests for that, it will be impossible to test it in app
+
 export const suggestNewAssignmentRule = (
   previousAssignments: Assignment[],
   currentlyReviewing: Reviewable,
@@ -184,10 +224,10 @@ export const suggestNewAssignmentRule = (
   > = createInitialScoreTableFromAssignments(previousAssignments)
 
   fillScoreTableWithAssignments(assignmentScoreTable, previousAssignments) // Have to cache it to not loose already added assignment
-  //fillScoreTableWithAssignments(assignmentScoreTable, [currentAssignment]) //
+  fillScoreTableWithAssignments(assignmentScoreTable, [currentAssignment]) //
 
   // findSamePaymentButDifferentCategory - this will be to find out if user accidentally match with different category, but will have to allow him to do it, maybe by acknowledged_wrong_assignments (new table, entities and matching)?
   // Nah, lets just reduce amount of points after normal flow
   // Need to create user diagrams for that :<
-  //findAssignmentRulesBiggerThan3
+  return findAssignmentRulesBiggerThanThreshold(assignmentScoreTable, 4)
 }
