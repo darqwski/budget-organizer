@@ -20,7 +20,7 @@ const KEYS_TO_SKIP: Omit<keyof Reviewable, "details">[] = [
 ]
 
 const COMPARISON_RULES: ComparisonRule["ruleName"][] = ["string-match"]
-type AssignmentScoreEntry = AssignmentRuleToAdd & { score: number }
+export type AssignmentScoreEntry = AssignmentRuleToAdd & { score: number }
 type ScoreTableKey = string
 type AssignmentScoreTable = Record<ScoreTableKey, AssignmentScoreEntry>
 
@@ -47,7 +47,7 @@ type AssignmentScoreTable = Record<ScoreTableKey, AssignmentScoreEntry>
  *    }
  *  }
  */
-const createInitialAssignmentScoreEntry = (
+const createAssignmentScoreEntry = (
   payment: PaymentDetails,
   categoryId: number,
   paymentKeyCombination: string[]
@@ -92,7 +92,6 @@ const createScoreTableKey = (
 
 const addPaymentAndCategoryToAssignmentScoreTable = (
   assignmentScoreTable: AssignmentScoreTable,
-
   categoryId: number,
   payment: PaymentDetails
 ) => {
@@ -104,7 +103,7 @@ const addPaymentAndCategoryToAssignmentScoreTable = (
     if (assignmentScoreTable[key]) {
       assignmentScoreTable[key].score += 1
     } else {
-      assignmentScoreTable[key] = createInitialAssignmentScoreEntry(
+      assignmentScoreTable[key] = createAssignmentScoreEntry(
         payment,
         categoryId,
         paymentKeyCombination
@@ -140,6 +139,10 @@ export const compareAssignmentToAssignmentScoreEntry = (
   assignment: AssignmentToAdd,
   assignmentScoreEntry: AssignmentScoreEntry
 ): boolean => {
+  if (assignment.categoryId !== assignmentScoreEntry.categoryId) {
+    return false
+  }
+
   for (const [
     minimalPaymentKey,
     minimalPaymentComparisonRule,
@@ -152,7 +155,7 @@ export const compareAssignmentToAssignmentScoreEntry = (
     if (minimalPaymentComparisonRule.ruleName === "string-match") {
       const jaro = jaroDistance(
         `${assignmentValue}`,
-        minimalPaymentComparisonRule.value as string
+        `${minimalPaymentComparisonRule.value}`
       )
 
       if (jaro < JARO_THRESHOLD) {

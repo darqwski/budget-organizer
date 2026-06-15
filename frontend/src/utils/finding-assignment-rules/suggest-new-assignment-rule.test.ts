@@ -1,10 +1,18 @@
 import { expect, describe, it } from "vitest"
 import {
+  type AssignmentScoreEntry,
+  compareAssignmentToAssignmentScoreEntry,
   createInitialScoreTableFromAssignments,
+  fillScoreTableWithAssignments,
   getListOfPaymentCombinations,
+  suggestNewAssignmentRule,
 } from "./suggest-new-assignment-rule.ts"
 import type { Assignment, PaymentDetails } from "../../model/assignment.ts"
 import { v7 } from "uuid"
+import {
+  JARO_DISTANCE_PAIRS,
+  STRING_TO_MATCH_TO_JARO_DISTANCE,
+} from "./jaro-comparison.test.ts"
 
 // looks like N: 2^N-1
 const COMBINATIONS_BY_LENGTH: Record<2 | 3 | 4, number> = {
@@ -89,6 +97,30 @@ const createMockAssignment = ({
         },
         { ...paymentDetails }
       ),
+    },
+  }
+}
+
+const createMockAssignmentScoreEntry = (): AssignmentScoreEntry => {
+  return {
+    score: 0,
+    categoryId: 1,
+    minimalPayment: {
+      keyForMatchingNumber: {
+        value: 1,
+        ruleName: "string-match",
+        ruleValues: {},
+      },
+      keyForMatchingString: {
+        value: "1",
+        ruleName: "string-match",
+        ruleValues: {},
+      },
+      keyForMatchingJaro: {
+        value: STRING_TO_MATCH_TO_JARO_DISTANCE,
+        ruleName: "string-match",
+        ruleValues: {},
+      },
     },
   }
 }
@@ -180,3 +212,94 @@ describe("createInitialScoreTableFromAssignments", () => {
     ])
   })
 })
+
+describe("compareAssignmentToAssignmentScoreEntry", () => {
+  const assignmentScoreEntry = createMockAssignmentScoreEntry()
+
+  it("should return false if payment is for another category", () => {
+    const assignment = createMockAssignment({
+      paymentDetails: {
+        keyForMatchingNumber: 1,
+        keyForMatchingString: "1",
+        keyForMatchingJaro: STRING_TO_MATCH_TO_JARO_DISTANCE,
+      },
+    })
+    assignment.categoryId = 12345789
+    const result = compareAssignmentToAssignmentScoreEntry(
+      assignment,
+      assignmentScoreEntry
+    )
+
+    expect(result).toBe(false)
+  })
+
+  it("should return false if comparison rule contains not supported rule", () => {
+    const assignmentScoreEntry = createMockAssignmentScoreEntry()
+    // @ts-expect-error Checking something which should not work
+    assignmentScoreEntry.minimalPayment.keyForMatchingString.ruleName =
+      "non-existing-ruel"
+    const assignment = createMockAssignment({
+      paymentDetails: {
+        keyForMatchingNumber: 1,
+        keyForMatchingString: "1",
+        keyForMatchingJaro: STRING_TO_MATCH_TO_JARO_DISTANCE,
+      },
+    })
+    const result = compareAssignmentToAssignmentScoreEntry(
+      assignment,
+      assignmentScoreEntry
+    )
+
+    expect(result).toBeFalsy()
+  })
+
+  it("should return false if payment is is missing one payment key (even if have others matching)", () => {
+    const assignment = createMockAssignment({
+      paymentDetails: {
+        keyForMatchingNumber: 1,
+        keyForMatchingString: "1",
+      },
+    })
+    const result = compareAssignmentToAssignmentScoreEntry(
+      assignment,
+      assignmentScoreEntry
+    )
+
+    expect(result).toBe(false)
+  })
+
+  it("should return false if payment is not matching one payment key (even if have others matching)", () => {
+    const assignment = createMockAssignment({
+      paymentDetails: {
+        keyForMatchingNumber: 1,
+        keyForMatchingString: "1",
+        keyForMatchingJaro: JARO_DISTANCE_PAIRS[47],
+      },
+    })
+    const result = compareAssignmentToAssignmentScoreEntry(
+      assignment,
+      assignmentScoreEntry
+    )
+
+    expect(result).toBe(false)
+  })
+
+  it("should return true if all minimal payment keys match to payment (even if payment has more keys)", () => {
+    const assignment = createMockAssignment({
+      paymentDetails: {
+        keyForMatchingNumber: 1,
+        keyForMatchingString: "1",
+        keyForMatchingJaro: JARO_DISTANCE_PAIRS[91],
+      },
+    })
+    const result = compareAssignmentToAssignmentScoreEntry(
+      assignment,
+      assignmentScoreEntry
+    )
+
+    expect(result).toBeTruthy()
+  })
+})
+
+describe("fillScoreTableWithAssignments", () => {})
+describe("suggestNewAssignmentRule", () => {})
