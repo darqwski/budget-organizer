@@ -47,6 +47,16 @@ type AssignmentScoreTable = Record<ScoreTableKey, AssignmentScoreEntry>
  *    }
  *  }
  */
+const assignmentScoreTable: AssignmentScoreTable = {}
+
+export const clearAssignmentScoreTable = () => {
+  for (const key in assignmentScoreTable) {
+    delete assignmentScoreTable[key]
+  }
+}
+
+export const getAssignmentScoreTable = () => assignmentScoreTable
+
 const createAssignmentScoreEntry = (
   payment: PaymentDetails,
   categoryId: number,
@@ -83,7 +93,7 @@ export const getListOfPaymentCombinations = (
   return getListOfCombinations(paymentKeys)
 }
 
-const createScoreTableKey = (
+export const createScoreTableKey = (
   categoryId: number,
   paymentKeyCombination: string[],
   payment: PaymentDetails
@@ -91,7 +101,6 @@ const createScoreTableKey = (
   `${categoryId}-${[paymentKeyCombination.map((paymentKey) => [paymentKey, payment[paymentKey]].join("/")).join("-")]}`
 
 const addPaymentAndCategoryToAssignmentScoreTable = (
-  assignmentScoreTable: AssignmentScoreTable,
   categoryId: number,
   payment: PaymentDetails
 ) => {
@@ -100,15 +109,11 @@ const addPaymentAndCategoryToAssignmentScoreTable = (
     // Maybe its worth to think about remodeling it from this string to object representing entries?
     const key = createScoreTableKey(categoryId, paymentKeyCombination, payment)
 
-    if (assignmentScoreTable[key]) {
-      assignmentScoreTable[key].score += 1
-    } else {
-      assignmentScoreTable[key] = createAssignmentScoreEntry(
-        payment,
-        categoryId,
-        paymentKeyCombination
-      )
-    }
+    assignmentScoreTable[key] ??= createAssignmentScoreEntry(
+      payment,
+      categoryId,
+      paymentKeyCombination
+    )
   }
 }
 
@@ -152,23 +157,20 @@ export const compareAssignmentToAssignmentScoreEntry = (
   return true
 }
 
-// Mutation based function!!
 export const fillScoreTableWithAssignments = (
-  assignmentScoreTable: AssignmentScoreTable,
   assignments: AssignmentToAdd[]
 ) => {
-  const assignmentScoreEntries = Object.values(assignmentScoreTable)
   for (const assignment of assignments) {
     addPaymentAndCategoryToAssignmentScoreTable(
-      assignmentScoreTable,
       assignment.categoryId,
       assignment.payment
     )
 
-    const assignmentsForCategory = assignmentScoreEntries.filter(
-      (assignmentScoreEntry) =>
-        assignmentScoreEntry.categoryId === assignment.categoryId
+    const assignmentsForCategory = Object.values(assignmentScoreTable).filter(
+      (assignmentScoreTableEntry) =>
+        assignmentScoreTableEntry.categoryId === assignment.categoryId
     )
+
     for (const assignmentForCategory of assignmentsForCategory) {
       const matching = compareAssignmentToAssignmentScoreEntry(
         assignment,
@@ -183,19 +185,22 @@ export const fillScoreTableWithAssignments = (
 }
 
 const findAssignmentRulesBiggerThanThreshold = (
-  scoreTable: AssignmentScoreTable,
   threshold: number
 ): AssignmentRuleToAdd[] => {
-  const scoreTableEntries = Object.values(scoreTable)
+  const scoreTableEntries = Object.values(assignmentScoreTable)
 
   return scoreTableEntries.filter(
     (scoreTableEntry) => scoreTableEntry.score > threshold
   )
 }
-// This util is dedicated for suggesting not applying assignment rule
+
+export const addPreviousAssignmentsToScoreTable = (
+  previousAssignments: Assignment[]
+) => {
+  fillScoreTableWithAssignments(previousAssignments)
+}
 
 export const suggestNewAssignmentRule = (
-  previousAssignments: Assignment[],
   currentlyReviewing: Reviewable,
   categoryId: number
 ): AssignmentRuleToAdd[] => {
@@ -204,16 +209,7 @@ export const suggestNewAssignmentRule = (
     categoryId
   )
 
-  const assignmentScoreTable: Record<
-    string,
-    AssignmentRuleToAdd & { score: number }
-  > = {}
+  fillScoreTableWithAssignments([currentAssignment])
 
-  fillScoreTableWithAssignments(assignmentScoreTable, previousAssignments) // Have to cache it to not loose already added assignment
-  fillScoreTableWithAssignments(assignmentScoreTable, [currentAssignment]) //
-
-  // findSamePaymentButDifferentCategory - this will be to find out if user accidentally match with different category, but will have to allow him to do it, maybe by acknowledged_wrong_assignments (new table, entities and matching)?
-  // Nah, lets just reduce amount of points after normal flow
-  // Need to create user diagrams for that :<
-  return findAssignmentRulesBiggerThanThreshold(assignmentScoreTable, 4)
+  return findAssignmentRulesBiggerThanThreshold(4)
 }

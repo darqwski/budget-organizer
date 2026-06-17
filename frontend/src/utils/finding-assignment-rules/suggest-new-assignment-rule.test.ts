@@ -1,8 +1,11 @@
-import { expect, describe, it } from "vitest"
+import { expect, describe, it, beforeEach } from "vitest"
 import {
   type AssignmentScoreEntry,
+  clearAssignmentScoreTable,
   compareAssignmentToAssignmentScoreEntry,
+  createScoreTableKey,
   fillScoreTableWithAssignments,
+  getAssignmentScoreTable,
   getListOfPaymentCombinations,
   suggestNewAssignmentRule,
 } from "./suggest-new-assignment-rule.ts"
@@ -72,17 +75,19 @@ describe("getListOfPaymentCombinations", () => {
   })
 })
 
-const createMockAssignment = ({
+export const createMockAssignment = ({
   paymentKeyAmount = 0,
   paymentDetails = {},
+  categoryId = 1,
 }: {
   paymentKeyAmount?: number
   paymentDetails?: PaymentDetails
+  categoryId?: number
 } = {}): Assignment => {
   return {
     summaryId: 1,
     created: null,
-    categoryId: 1,
+    categoryId,
     assignmentId: Date.now() * Math.random(),
     payment: {
       id: v7(),
@@ -213,11 +218,15 @@ describe("compareAssignmentToAssignmentScoreEntry", () => {
 })
 
 describe("fillScoreTableWithAssignments", () => {
+  beforeEach(() => {
+    clearAssignmentScoreTable()
+  })
+
   describe("creating entries", () => {
     it("should create initial score table from 1 assignment with 3 keys", () => {
       const mockAssignment1 = createMockAssignment({ paymentKeyAmount: 4 })
-      const scoreTable = {}
-      fillScoreTableWithAssignments(scoreTable, [mockAssignment1])
+      fillScoreTableWithAssignments([mockAssignment1])
+      const scoreTable = getAssignmentScoreTable()
 
       expect(Object.keys(scoreTable)).toHaveLength(COMBINATIONS_BY_LENGTH[4])
     })
@@ -229,12 +238,9 @@ describe("fillScoreTableWithAssignments", () => {
       const mockAssignment2 = createMockAssignment({
         paymentDetails: { key4: 4, key5: 5, key6: 6, key7: 7 },
       })
-      const scoreTable = {}
 
-      fillScoreTableWithAssignments(scoreTable, [
-        mockAssignment1,
-        mockAssignment2,
-      ])
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+      const scoreTable = getAssignmentScoreTable()
 
       expect(Object.keys(scoreTable)).toHaveLength(
         COMBINATIONS_BY_LENGTH[4] + COMBINATIONS_BY_LENGTH[3]
@@ -255,12 +261,9 @@ describe("fillScoreTableWithAssignments", () => {
           collisionKey: 1,
         },
       })
-      const scoreTable = {}
 
-      fillScoreTableWithAssignments(scoreTable, [
-        mockAssignment1,
-        mockAssignment2,
-      ])
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+      const scoreTable = getAssignmentScoreTable()
 
       expect(Object.keys(scoreTable)).toHaveLength(5)
       expect(Object.keys(scoreTable).sort()).toEqual([
@@ -287,11 +290,8 @@ describe("fillScoreTableWithAssignments", () => {
         },
       })
 
-      const scoreTable = {}
-      fillScoreTableWithAssignments(scoreTable, [
-        mockAssignment1,
-        mockAssignment2,
-      ])
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+      const scoreTable = getAssignmentScoreTable()
 
       expect(Object.keys(scoreTable)).toHaveLength(6)
       expect(Object.keys(scoreTable).sort()).toEqual([
@@ -302,6 +302,140 @@ describe("fillScoreTableWithAssignments", () => {
         "1-uniqueKey1/2",
         "1-uniqueKey1/2-collisionKey/-1",
       ])
+    })
+  })
+
+  describe("incrementing values", () => {
+    it("should increment value of its own created score-table-entries", () => {
+      const mockAssignment1 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+          key2: 2,
+        },
+      })
+
+      const mockAssignment2 = createMockAssignment({
+        paymentDetails: {
+          key3: 3,
+          key4: 4,
+        },
+      })
+
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+
+      const scoreTable = getAssignmentScoreTable()
+
+      console.log(JSON.stringify(scoreTable))
+      for (const key in scoreTable) {
+        expect(scoreTable[key].score).toBe(1)
+      }
+    })
+
+    it("should increment of other score-table-entries", () => {
+      const mockAssignment1 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+        },
+      })
+
+      const mockAssignment2 = createMockAssignment({
+        paymentDetails: {
+          key1: 2,
+        },
+      })
+
+      const mockAssignment3 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+        },
+      })
+
+      fillScoreTableWithAssignments([
+        mockAssignment1,
+        mockAssignment2,
+        mockAssignment3,
+      ])
+
+      const scoreTable = getAssignmentScoreTable()
+
+      const onlyInitiallyIncrementedKey = createScoreTableKey(
+        mockAssignment2.categoryId,
+        ["key1"],
+        mockAssignment2.payment
+      )
+      const keyIncrementedBy2Assignments = createScoreTableKey(
+        mockAssignment1.categoryId,
+        ["key1"],
+        mockAssignment1.payment
+      )
+
+      console.log(scoreTable)
+      expect(scoreTable[onlyInitiallyIncrementedKey].score).toBe(1)
+      expect(scoreTable[keyIncrementedBy2Assignments].score).toBe(2)
+    })
+
+    it("should increment previously created entries and previously created entries should increment it too", () => {
+      const mockAssignment1 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+        },
+      })
+
+      const mockAssignment2 = createMockAssignment({
+        paymentDetails: {
+          key1: 2,
+        },
+      })
+
+      const mockAssignment3 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+        },
+      })
+
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+      fillScoreTableWithAssignments([mockAssignment3])
+
+      const scoreTable = getAssignmentScoreTable()
+      const onlyInitiallyIncrementedKey = createScoreTableKey(
+        mockAssignment2.categoryId,
+        ["key1"],
+        mockAssignment2.payment
+      )
+      const keyIncrementedBy2Assignments = createScoreTableKey(
+        mockAssignment1.categoryId,
+        ["key1"],
+        mockAssignment1.payment
+      )
+
+      console.log(scoreTable)
+      expect(scoreTable[onlyInitiallyIncrementedKey].score).toBe(1)
+      expect(scoreTable[keyIncrementedBy2Assignments].score).toBe(2)
+    })
+
+    it("should not increment score-table-entries which are created for different category", () => {
+      const mockAssignment1 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+          key2: 2,
+        },
+        categoryId: 1,
+      })
+
+      const mockAssignment2 = createMockAssignment({
+        paymentDetails: {
+          key1: 1,
+        },
+        categoryId: 2,
+      })
+
+      fillScoreTableWithAssignments([mockAssignment1, mockAssignment2])
+
+      const scoreTable = getAssignmentScoreTable()
+
+      for (const key in scoreTable) {
+        expect(scoreTable[key].score).toBe(1)
+      }
     })
   })
 })
