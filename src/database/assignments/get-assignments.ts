@@ -8,7 +8,7 @@ export const getAssignmentsFromDB = async (
 ): Promise<Assignment[]> => {
   try {
     const result = await pool.query(
-      "SELECT assignment_id, user_id, summary_id, category_id, payment, created FROM assignemtns WHERE user_id = $1",
+      "SELECT assignment_id, user_id, summary_id, category_id, payment, created FROM assignments WHERE user_id = $1",
       [user.userId]
     )
 

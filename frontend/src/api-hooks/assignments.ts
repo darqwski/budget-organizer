@@ -2,6 +2,10 @@ import { create } from "zustand"
 import { useEffect } from "react"
 import type { Assignment } from "../model/assignment.ts"
 import { fetchAssignments } from "../api/assignments.ts"
+import {
+  clearAssignmentScoreTable,
+  fillScoreTableWithAssignments,
+} from "../utils/finding-assignment-rules/suggest-new-assignment-rule.ts"
 
 type UseAssignments = {
   assignments: Assignment[] | null
@@ -35,7 +39,10 @@ export const useAssignmentsFromServer = () => {
     setLoading(true)
     fetchAssignments()
       .then((assignments) => {
-        setAssignments(assignments)
+        clearAssignmentScoreTable()
+        console.time("Filling table with")
+        fillScoreTableWithAssignments(assignments)
+        console.timeEnd("Filling table with")
       })
       .finally(() => setLoading(false))
   }, [assignments, setAssignments, setLoading])

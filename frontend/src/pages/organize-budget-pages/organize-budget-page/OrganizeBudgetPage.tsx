@@ -15,9 +15,9 @@ import { suggestNewAssignmentRule } from "../../../utils/finding-assignment-rule
 const OrganizeBudgetPage = () => {
   const { categories } = useCategoriesFromServer()
   const { reviewable, removeReviewable, moveFirstToEnd } = useReviewable()
-  const { assignments } = useAssignmentsFromServer()
   const { addReviewed } = useReviewed()
   const { t } = useTranslation()
+  useAssignmentsFromServer()
   const navigate = useNavigate()
 
   //TODO avoid useEffect
@@ -35,7 +35,6 @@ const OrganizeBudgetPage = () => {
     }
 
     const suggestedAssignmentRules = suggestNewAssignmentRule(
-      assignments || [],
       currentlyReviewing,
       category.categoryId
     )

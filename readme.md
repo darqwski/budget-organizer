@@ -10,6 +10,8 @@
 
 
 ### TODO
-Implement JWT token validation and refreshing
-
-Unify types between backend and frontend 
+TODO Unify types between backend and frontend 
+TODO add category button while organize budget
+TODO add split payment while organize budget
+TODO add properties to skip while suggesting assignment 
+TODO add banned-rules which will have static effect -100 points on assignment-rule (storeable in DB)

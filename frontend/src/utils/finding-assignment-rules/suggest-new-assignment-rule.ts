@@ -194,12 +194,6 @@ const findAssignmentRulesBiggerThanThreshold = (
   )
 }
 
-export const addPreviousAssignmentsToScoreTable = (
-  previousAssignments: Assignment[]
-) => {
-  fillScoreTableWithAssignments(previousAssignments)
-}
-
 export const suggestNewAssignmentRule = (
   currentlyReviewing: Reviewable,
   categoryId: number

@@ -7,7 +7,6 @@ import {
   fillScoreTableWithAssignments,
   getAssignmentScoreTable,
   getListOfPaymentCombinations,
-  suggestNewAssignmentRule,
 } from "./suggest-new-assignment-rule.ts"
 import type { Assignment, PaymentDetails } from "../../model/assignment.ts"
 import { v7 } from "uuid"
@@ -439,4 +438,3 @@ describe("fillScoreTableWithAssignments", () => {
     })
   })
 })
-describe("suggestNewAssignmentRule", () => {})
