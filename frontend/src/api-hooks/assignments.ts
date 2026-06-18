@@ -5,7 +5,9 @@ import { fetchAssignments } from "../api/assignments.ts"
 import {
   clearAssignmentScoreTable,
   fillScoreTableWithAssignments,
+  updateSuggestAssignmentConfig,
 } from "../utils/finding-assignment-rules/suggest-new-assignment-rule.ts"
+import { fetchSuggestAssignmentsConfig } from "../api/suggest-assignments-config.ts"
 
 type UseAssignments = {
   assignments: Assignment[] | null
@@ -37,11 +39,17 @@ export const useAssignmentsFromServer = () => {
       return
     }
     setLoading(true)
-    fetchAssignments()
+
+    fetchSuggestAssignmentsConfig()
+      .then((suggestAssignmentConfig) =>
+        updateSuggestAssignmentConfig(suggestAssignmentConfig)
+      )
+      .then(() => fetchAssignments())
       .then((assignments) => {
         clearAssignmentScoreTable()
         console.time("Filling table with")
         fillScoreTableWithAssignments(assignments)
+
         console.timeEnd("Filling table with")
       })
       .finally(() => setLoading(false))

@@ -24,10 +24,10 @@ suggestAssignmentsConfigRouter.post(
       }
       const config = req.body
 
-      const insertedConfigId =
+      const suggestAssignmentConfigId =
         await updateOrInsertSuggestAssignmentConfigIntoDB(config, user)
 
-      res.status(200).json({ insertedConfigId })
+      res.status(200).json({ suggestAssignmentConfigId })
     } catch (error) {
       next(error)
     }

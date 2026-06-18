@@ -12,6 +12,7 @@ import { mapRevieableToAssignmentToAdd } from "../../pages/organize-budget-pages
 import { getListOfCombinations } from "./get-list-of-combinations.ts"
 import { jaroDistance } from "./jaro-comparison.ts"
 import { JARO_THRESHOLD } from "../../constants/suggesting-values.ts"
+import type { SuggestAssignmentsConfig } from "../../model/suggest-assignments-config.ts"
 const KEYS_TO_SKIP: Omit<keyof Reviewable, "details">[] = [
   "id",
   "date",
@@ -48,6 +49,14 @@ type AssignmentScoreTable = Record<ScoreTableKey, AssignmentScoreEntry>
  *  }
  */
 const assignmentScoreTable: AssignmentScoreTable = {}
+
+let suggestAssignmentConfig: SuggestAssignmentsConfig | null = null
+
+export const updateSuggestAssignmentConfig = (
+  newSuggestAssignmentsConfig: SuggestAssignmentsConfig | null
+) => {
+  suggestAssignmentConfig = newSuggestAssignmentsConfig
+}
 
 export const clearAssignmentScoreTable = () => {
   for (const key in assignmentScoreTable) {
