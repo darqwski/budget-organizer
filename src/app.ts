@@ -9,6 +9,7 @@ import routerLogin from "./routes/auth"
 import cors from "cors"
 import routerSummaries from "./routes/summaries"
 import assignmentRouter from "./routes/assignments"
+import suggestAssignmentsConfigRouter from "./routes/suggest-assignments-config"
 
 config()
 
@@ -30,6 +31,7 @@ app.use("/api/auth", routerLogin)
 app.use("/api/categories", categoriesRoute)
 app.use("/api/summaries", routerSummaries)
 app.use("/api/assignments", assignmentRouter)
+app.use("/api/suggest-assignments-config", suggestAssignmentsConfigRouter)
 
 app.use(errorHandler)
 
