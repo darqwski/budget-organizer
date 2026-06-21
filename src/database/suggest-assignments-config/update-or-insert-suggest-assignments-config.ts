@@ -12,7 +12,7 @@ const mapEntriesToUpdateQuery = (
 ): string => {
   return entries
     .filter(([key]) => key)
-    .map(([key], index) => `${key} = $${index}`)
+    .map(([key], index) => `${key} = $${index + 2}`)
     .join(", ")
 }
 
@@ -34,9 +34,11 @@ export const updateOrInsertSuggestAssignmentConfigIntoDB = async (
 
   if (currentConfig) {
     const query = `UPDATE suggest_assignments_config SET ${mapEntriesToUpdateQuery(sanitizedEntries)} WHERE suggest_assignments_config_id = $1`
+    console.log(query)
+
     const result = await pool.query(query, [
       currentConfig.suggestAssignmentsConfigId,
-      sanitizedEntries.map((entry) => entry[1]),
+      JSON.stringify(sanitizedEntries.map((entry) => entry[1])),
     ])
 
     console.log(query)
@@ -44,10 +46,12 @@ export const updateOrInsertSuggestAssignmentConfigIntoDB = async (
 
     return currentConfig.suggestAssignmentsConfigId
   } else {
-    const query = `INSERT INTO suggest_assignments_config (user_id, ${sanitizedEntries.map(([key]) => key)}) VALUES ($1, ${sanitizedEntries.map((_, index) => `$${index + 1}`).join(", ")}) RETURNING suggest_assignments_config_id;`
+    const query = `INSERT INTO suggest_assignments_config (user_id, ${sanitizedEntries.map(([key]) => key)}) VALUES ($1, ${sanitizedEntries.map((_, index) => `$${index + 2}`).join(", ")}) RETURNING suggest_assignments_config_id;`
+    console.log(query)
+
     const result = await pool.query(query, [
       user.userId,
-      sanitizedEntries.map((entry) => entry[1]),
+      JSON.stringify(sanitizedEntries.map((entry) => entry[1])),
     ])
 
     console.log(query)

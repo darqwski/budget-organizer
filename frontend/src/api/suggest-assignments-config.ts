@@ -10,7 +10,7 @@ export const fetchSuggestAssignmentsConfig =
     return data
   }
 
-export const updateSuggestAssignmentsConfig = async (
+export const mutateUpdateSuggestAssignmentsConfig = async (
   suggestAssignmentsConfig: Partial<SuggestAssignmentsConfig>
 ): Promise<number> => {
   const { data } = await http.post<{ suggestAssignmentsConfigId: number }>(

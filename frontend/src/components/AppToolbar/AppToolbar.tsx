@@ -37,6 +37,12 @@ const AppToolbar = () => {
         >
           {t("Categories")}
         </Link>
+        <Link
+          to="/manage-configs"
+          className="flex items-center text-center content-center"
+        >
+          {t("Configs")}
+        </Link>
       </div>
       <div>
         {isLoggedIn ? (

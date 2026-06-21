@@ -21,6 +21,7 @@ import {
 } from "chart.js"
 import { useEffect } from "react"
 import StatisticsPage from "./pages/statistics-page/StatisticsPage.tsx"
+import ManageConfigsPage from "./pages/manage-configs-page/ManageConfigsPage.tsx"
 
 const App = () => {
   useEffect(() => {
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
       {
         path: "manage-categories",
         Component: ManageCategoriesPage,
+      },
+      {
+        path: "manage-configs",
+        Component: ManageConfigsPage,
       },
       {
         path: "statistics",
