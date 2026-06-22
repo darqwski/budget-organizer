@@ -39,6 +39,7 @@ const OrganizeBudgetPage = () => {
       category.categoryId
     )
     if (suggestedAssignmentRules.length > 0) {
+      console.log({ suggestedAssignmentRules })
       // TODO
       // Show popup one by one,
       // if user accepts, add to the assignment-rule table

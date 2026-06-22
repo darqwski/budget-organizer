@@ -75,10 +75,6 @@ const ManageConfigsPageForm = ({
     return Object.entries(keyExamples).map(([key, values]) => ({ key, values }))
   })()
 
-  console.log({ assignmentKeyExamples: assignmentKeyExamples?.length })
-  console.log({ assignmentKeyExamples })
-  console.log({ assignments: assignments?.length })
-
   return (
     <Card>
       <form

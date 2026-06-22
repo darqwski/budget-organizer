@@ -96,7 +96,9 @@ export const getListOfPaymentCombinations = (
 
   // Omitting values which will be different for every payment which does not make sense to add them to score table
   const paymentKeys = paymentEntriesWithValue.filter(
-    (key) => !KEYS_TO_SKIP.includes(key)
+    (key) =>
+      !KEYS_TO_SKIP.includes(key) &&
+      !suggestAssignmentConfig?.bannedKeys.includes(key)
   )
 
   return getListOfCombinations(paymentKeys)
