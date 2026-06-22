@@ -12,7 +12,7 @@
 
 ### TODO
 
-TODO add properties to skip while suggesting assignment
+TODO add properties to skip while suggesting assignment - mostly done except suggesting rule suggesting wrong :<
 TODO add banned-rules which will have static effect -100 points on assignment-rule (storeable in DB)
 TODO Unify types between backend and frontend
 TODO add category button while organize budget
