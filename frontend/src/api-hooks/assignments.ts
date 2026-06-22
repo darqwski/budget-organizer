@@ -49,7 +49,7 @@ export const useAssignmentsFromServer = () => {
         clearAssignmentScoreTable()
         console.time("Filling table with")
         fillScoreTableWithAssignments(assignments)
-
+        setAssignments(assignments)
         console.timeEnd("Filling table with")
       })
       .finally(() => setLoading(false))

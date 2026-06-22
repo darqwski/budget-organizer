@@ -30,5 +30,11 @@
   "Go back to all summaries": "Go back to all summaries",
   "Comparing to previous month": "Comparing to previous month",
   "Nothing to compare": "Nothing to compare",
-  "Balance": "Balance"
+  "Balance": "Balance",
+  "Field mandatory": "Field mandatory",
+  "Banned keys": "Banned keys",
+  "These keys will not be use for suggesting rules": "These keys will not be use for suggesting rules",
+  "Keys and their examples": "Keys and their examples",
+  "Save configs": "Save configs",
+  "Add new key": "Add new key"
 }

@@ -6,7 +6,6 @@ import ManageConfigsPageForm from "./ManageConfigsPageForm.tsx"
 const ManageConfigsPage = () => {
   const { suggestAssignmentsConfig, loading } = useConfigsFromServer()
 
-  console.log({ suggestAssignmentsConfig, loading })
   return (
     <PageWrapper className="gap-8">
       {loading ? (
@@ -15,7 +14,7 @@ const ManageConfigsPage = () => {
         </div>
       ) : (
         <ManageConfigsPageForm
-          suggestAssignmentsConfig={suggestAssignmentsConfig}
+          suggestAssignmentsConfig={suggestAssignmentsConfig ?? null}
         />
       )}
     </PageWrapper>

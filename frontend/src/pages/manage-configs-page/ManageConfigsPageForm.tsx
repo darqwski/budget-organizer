@@ -11,6 +11,8 @@ import {
 } from "../../schemas/suggestion-assignment-config.schema.ts"
 import { mutateUpdateSuggestAssignmentsConfig } from "../../api/suggest-assignments-config.ts"
 import type { SuggestAssignmentsConfig } from "../../model/suggest-assignments-config.ts"
+import { useAssignmentsFromServer } from "../../api-hooks/assignments.ts"
+import ValueDesc from "../../components/ValueDesc/ValueDesc.tsx"
 
 const ManageConfigsPageForm = ({
   suggestAssignmentsConfig,
@@ -19,14 +21,9 @@ const ManageConfigsPageForm = ({
 }) => {
   const { t } = useTranslation()
   const { refreshSuggestAssignmentsConfig } = useConfigsFromServer()
-  console.log(
-    "suggestAssignmentsConfig?.bannedKeys",
-    suggestAssignmentsConfig?.bannedKeys
-  )
+  const { assignments } = useAssignmentsFromServer()
 
-  console.log("mapped", suggestAssignmentsConfig?.bannedKeys)
-
-  const { handleSubmit, control, reset, formState } =
+  const { handleSubmit, control, reset } =
     useForm<SuggestionAssignmentConfigSchema>({
       resolver: zodResolver(suggestionAssignmentConfigSchema()),
       defaultValues: {
@@ -37,8 +34,6 @@ const ManageConfigsPageForm = ({
         ),
       },
     })
-
-  console.log({ formState })
 
   const { fields, append, remove } = useFieldArray({
     keyName: "name",
@@ -59,7 +54,30 @@ const ManageConfigsPageForm = ({
     reset()
   }
 
-  console.log(fields)
+  const assignmentKeyExamples = (() => {
+    if (!assignments) return []
+    const keyExamples: Record<string, (string | number)[]> = {}
+
+    for (const assignment of assignments) {
+      for (const [key, value] of Object.entries(assignment.payment)) {
+        keyExamples[key] ??= []
+
+        if (keyExamples[key].length > 3) {
+          continue
+        }
+
+        if (value) {
+          keyExamples[key].push(value)
+        }
+      }
+    }
+
+    return Object.entries(keyExamples).map(([key, values]) => ({ key, values }))
+  })()
+
+  console.log({ assignmentKeyExamples: assignmentKeyExamples?.length })
+  console.log({ assignmentKeyExamples })
+  console.log({ assignments: assignments?.length })
 
   return (
     <Card>
@@ -67,9 +85,33 @@ const ManageConfigsPageForm = ({
         className="flex flex-col gap-1"
         onSubmit={handleSubmit(updateSuggestionAssignmentConfig)}
       >
+        <p className="font-semibold text-xl">{t("Banned keys")}</p>
+        <p className="text-dark-grey xl">
+          {t("These keys will not be use for suggesting rules")}
+        </p>
+
+        <Card>
+          <p className="font-semibold">{t("Keys and their examples")}</p>
+          <div>
+            {assignmentKeyExamples.map((assignmentKeyExample) => (
+              <ValueDesc
+                className={[
+                  "overflow-hidden text-ellipsis",
+                  suggestAssignmentsConfig?.bannedKeys.includes(
+                    assignmentKeyExample.key
+                  ) && "opacity-50",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                value={assignmentKeyExample.values.join(",")}
+                desc={assignmentKeyExample.key}
+              />
+            ))}
+          </div>
+        </Card>
         {fields.map((field, index) => (
           <Controller
-            key={field.id}
+            key={field.name}
             control={control}
             name={`bannedKeys.${index}.name`}
             render={(controller) => {
@@ -77,7 +119,7 @@ const ManageConfigsPageForm = ({
 
               return (
                 <div className="flex flex-row w-full">
-                  <Form.Item label={t("Add new category")}>
+                  <Form.Item label={t("Add new key")}>
                     <Input {...controller.field} />
                     {error?.message && (
                       <ErrorMessage message={String(error.message)} />

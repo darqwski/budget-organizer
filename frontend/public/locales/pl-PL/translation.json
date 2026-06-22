@@ -25,5 +25,11 @@
   "Go back to all summaries": "Wróć do podsumowań",
   "Comparing to previous month": "Porównanie do zeszłego miesiąca",
   "Nothing to compare": "Nic do porównania",
-  "Balance": "Bilans"
+  "Balance": "Bilans",
+  "Field mandatory": "Pole obowiązkowe",
+  "Banned keys": "Odrzucone klucze",
+  "These keys will not be use for suggesting rules": "Podane klucze nie będą używane podczas sugerowania ról",
+  "Keys and their examples": "Klucz i ich przykłady",
+  "Save configs": "Zapisz konfiguracje",
+  "Add new key": "Dodaj nowy klucz"
 }
