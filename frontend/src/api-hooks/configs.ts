@@ -4,7 +4,7 @@ import { fetchSuggestAssignmentsConfig } from "../api/suggest-assignments-config
 import type { SuggestAssignmentsConfig } from "../model/suggest-assignments-config.ts"
 
 type UseConfigs = {
-  suggestAssignmentsConfig: SuggestAssignmentsConfig | null
+  suggestAssignmentsConfig?: SuggestAssignmentsConfig | null
   loading: boolean
   setSuggestAssignmentsConfig: (
     suggestAssignmentsConfig: SuggestAssignmentsConfig | null
@@ -14,7 +14,7 @@ type UseConfigs = {
 }
 
 const useConfigs = create<UseConfigs>((set) => ({
-  suggestAssignmentsConfig: null,
+  suggestAssignmentsConfig: undefined,
   setLoading: (loading) => set({ loading }),
   loading: false,
   setSuggestAssignmentsConfig: (
@@ -34,7 +34,7 @@ export const useConfigsFromServer = () => {
   } = useConfigs()
 
   useEffect(() => {
-    if (suggestAssignmentsConfig) {
+    if (suggestAssignmentsConfig !== undefined) {
       return
     }
     setLoading(true)

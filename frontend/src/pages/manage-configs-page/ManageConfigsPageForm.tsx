@@ -1,5 +1,3 @@
-import PageWrapper from "../../components/PageWrapper/PageWrapper.tsx"
-
 import { Button, Card, Form, Input } from "antd"
 import { useTranslation } from "react-i18next"
 import { Controller, useFieldArray, useForm } from "react-hook-form"
@@ -21,26 +19,47 @@ const ManageConfigsPageForm = ({
 }) => {
   const { t } = useTranslation()
   const { refreshSuggestAssignmentsConfig } = useConfigsFromServer()
-  const { handleSubmit, control, reset } =
+  console.log(
+    "suggestAssignmentsConfig?.bannedKeys",
+    suggestAssignmentsConfig?.bannedKeys
+  )
+
+  console.log("mapped", suggestAssignmentsConfig?.bannedKeys)
+
+  const { handleSubmit, control, reset, formState } =
     useForm<SuggestionAssignmentConfigSchema>({
       resolver: zodResolver(suggestionAssignmentConfigSchema()),
       defaultValues: {
-        bannedKeys: suggestAssignmentsConfig?.bannedKeys ?? [],
+        bannedKeys: (suggestAssignmentsConfig?.bannedKeys ?? []).map(
+          (name) => ({
+            name,
+          })
+        ),
       },
     })
 
+  console.log({ formState })
+
   const { fields, append, remove } = useFieldArray({
+    keyName: "name",
     name: "bannedKeys",
     control,
   })
 
   const updateSuggestionAssignmentConfig = async (
-    suggestAssignmentsConfig: Partial<SuggestAssignmentsConfig>
+    suggestAssignmentsConfig: Partial<SuggestionAssignmentConfigSchema>
   ) => {
-    await mutateUpdateSuggestAssignmentsConfig(suggestAssignmentsConfig)
+    await mutateUpdateSuggestAssignmentsConfig({
+      ...suggestAssignmentsConfig,
+      bannedKeys: (suggestAssignmentsConfig.bannedKeys ?? []).map(
+        ({ name }) => name
+      ),
+    })
     refreshSuggestAssignmentsConfig()
     reset()
   }
+
+  console.log(fields)
 
   return (
     <Card>
@@ -52,7 +71,7 @@ const ManageConfigsPageForm = ({
           <Controller
             key={field.id}
             control={control}
-            name={`bannedKeys.${index}`}
+            name={`bannedKeys.${index}.name`}
             render={(controller) => {
               const error = controller.formState.errors[controller.field.name]
 
@@ -79,7 +98,7 @@ const ManageConfigsPageForm = ({
           <Button
             type="primary"
             htmlType="submit"
-            onClick={() => append("")}
+            onClick={() => append({ key: "" })}
             icon={<PlusCircleFilled />}
           />
         </div>
